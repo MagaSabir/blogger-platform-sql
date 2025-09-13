@@ -1,30 +1,26 @@
-import { InjectModel } from '@nestjs/mongoose';
-import { User, UserDocument, UserModelType } from '../domain/users.domain';
+import { InjectDataSource } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
+import { CreateUserDto } from '../dto/create-user.dto';
+import { BadRequestException } from '@nestjs/common';
 
 export class UsersRepository {
-  constructor(@InjectModel(User.name) private UserModel: UserModelType) {}
-  async save(dto: UserDocument): Promise<string> {
-    const { _id } = await dto.save();
-    return _id.toString();
-  }
+  constructor(@InjectDataSource() private dataSource: DataSource) {}
 
-  async findUser(id: string): Promise<UserDocument | null> {
-    return this.UserModel.findOne({ _id: id, deletedAt: null });
-  }
+  async createUser(dto: CreateUserDto) {
+    try {
+      const query = `
+          INSERT INTO "Users" ("Login", "Password", "Email")
+          VALUES ($1, $2, $3) RETURNING "Id", "Login", "Email", "CreatedAt"
+      `;
+      const result = await this.dataSource.query(query, [
+        dto.login,
+        dto.password,
+        dto.email,
+      ]);
 
-  async findUserByLoginOrEmail(
-    login?: string,
-    email?: string,
-  ): Promise<UserDocument | null> {
-    const user = await this.UserModel.findOne({
-      $or: [{ login }, { email }],
-      deletedAt: null,
-    });
-
-    return user;
-  }
-
-  async findUserByCode(code: string) {
-    return this.UserModel.findOne({ confirmationCode: code, deletedAt: null });
+      return result[0];
+    } catch (error) {
+      throw new BadRequestException('User with this email already exists');
+    }
   }
 }

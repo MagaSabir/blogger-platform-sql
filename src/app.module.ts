@@ -2,29 +2,33 @@ import { configModule } from './config';
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { BloggersPlatformModule } from './modules/bloggers-platform/bloggers-platform.module';
-import { MongooseModule } from '@nestjs/mongoose';
 import { TestingModule } from './modules/testing/testing.module';
-import { UsersModule } from './modules/user-accounts/users.module';
 import { NotificationModule } from './modules/notification/notification.module';
 import { APP_FILTER } from '@nestjs/core';
 import { DomainHttpExceptionsFilter } from './core/exceptions/filters/error-exception-filter';
 import { ThrottlerModule } from '@nestjs/throttler';
-import * as process from 'node:process';
 import { CoreConfig } from './core/config/core.config';
 import { CoreModule } from './core/config/core.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { UsersModule } from './modules/user-accounts/users/users.module';
 
 @Module({
   imports: [
     CoreModule,
-    MongooseModule.forRootAsync({
-      imports: [CoreModule],
-      useFactory: (coreConfig: CoreConfig) => {
-        return {
-          uri: coreConfig.mongo_uri,
-        };
-      },
-      inject: [CoreConfig],
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        type: 'postgres',
+        host: configService.get<string>('POSTGRES_HOST'),
+        port: configService.get<number>('POSTGRES_PORT'),
+        username: configService.get<string>('POSTGRES_USER'),
+        password: configService.get<string>('POSTGRES_PASSWORD'),
+        database: configService.get<string>('POSTGRES_DB'),
+        autoLoadEntities: false,
+        synchronize: false,
+      }),
+      inject: [ConfigService],
     }),
     configModule,
     ThrottlerModule.forRoot({
@@ -35,10 +39,9 @@ import { CoreModule } from './core/config/core.module';
         },
       ],
     }),
-    BloggersPlatformModule,
     TestingModule,
-    UsersModule,
     NotificationModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [
