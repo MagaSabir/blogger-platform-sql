@@ -1,26 +1,43 @@
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { CreateUserDto } from '../dto/create-user.dto';
-import { BadRequestException } from '@nestjs/common';
+import {
+  BadRequestException,
+  InternalServerErrorException,
+} from '@nestjs/common';
+import { UserViewModel } from '../api/view-dto/user-view-model';
+import { UserDbModel } from '../api/view-dto/user-db-model';
+import { CreateUserType } from '../application/usecase/admins/create-user.usecase';
 
 export class UsersRepository {
   constructor(@InjectDataSource() private dataSource: DataSource) {}
 
-  async createUser(dto: CreateUserDto) {
+  async createUser(dto: CreateUserType): Promise<UserViewModel> {
     try {
       const query = `
-          INSERT INTO "Users" ("Login", "Password", "Email")
-          VALUES ($1, $2, $3) RETURNING "Id", "Login", "Email", "CreatedAt"
+          INSERT INTO "Users" ("login", "passwordHash", "email")
+          VALUES ($1, $2, $3) RETURNING id, login, email, "createdAt"
       `;
-      const result = await this.dataSource.query(query, [
+      const result: UserViewModel[] = await this.dataSource.query(query, [
         dto.login,
-        dto.password,
+        dto.passwordHash,
         dto.email,
       ]);
-
       return result[0];
     } catch (error) {
-      throw new BadRequestException('User with this email already exists');
+      if (error.code === '23505') {
+        throw new BadRequestException('User already exists');
+      }
+      throw new InternalServerErrorException(error.message);
     }
+  }
+
+  async deleteUserById(id: number) {
+    const query = `DELETE FROM "Users" WHERE id = $1`;
+    await this.dataSource.query(query, [id]);
+  }
+
+  async findUserByLogin(login: string): Promise<UserDbModel> {
+    const query = `SELECT * FROM "Users" WHERE login = $1`;
+    return this.dataSource.query(query, [login]);
   }
 }
