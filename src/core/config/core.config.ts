@@ -19,19 +19,26 @@ export class CoreConfig {
   )
   port: number;
 
-  @IsString({
-    message: 'Set Env variable MONGO_URI',
-  })
-  mongo_uri: string;
+  db_port: number;
+  type: string;
+  host: string;
+  username: string;
+  password: string;
+  database: string;
 
   @IsEnum(Environments)
   env: string;
 
   constructor(private configService: ConfigService) {
+    this.db_port = Number(this.configService.get('DB_PORT'));
     this.port = Number(this.configService.get('PORT'));
-    this.mongo_uri = this.configService.get('MONGO_URI') || '';
+    this.type = this.configService.get('DB_TYPE') || '';
+    this.username = this.configService.get('DB_USERNAME') || '';
+    this.password = this.configService.get('DB_PASSWORD') || '';
+    this.database = this.configService.get('DB_NAME') || '';
+    this.host = this.configService.get('DB_HOST') || '';
     this.env = this.configService.get('NODE_ENV') || '';
-
+    console.log(this.env);
     ConfigValidation.validationConfig(this);
   }
 }

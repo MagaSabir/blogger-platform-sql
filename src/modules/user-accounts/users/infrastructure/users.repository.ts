@@ -3,10 +3,11 @@ import { DataSource } from 'typeorm';
 import {
   BadRequestException,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { UserViewModel } from '../api/view-dto/user-view-model';
 import { UserDbModel } from '../api/view-dto/user-db-model';
-import { CreateUserType } from '../application/usecase/admins/create-user.usecase';
+import { CreateUserType } from '../../types/create-user-type';
 
 export class UsersRepository {
   constructor(@InjectDataSource() private dataSource: DataSource) {}
@@ -14,15 +15,17 @@ export class UsersRepository {
   async createUser(dto: CreateUserType): Promise<UserViewModel> {
     try {
       const query = `
-          INSERT INTO "Users" ("login", "passwordHash", "email")
-          VALUES ($1, $2, $3) RETURNING id, login, email, "createdAt"
+          INSERT INTO "Users" ("login", "passwordHash", "email", "isConfirmed")
+          VALUES ($1, $2, $3, $4) RETURNING id, login, email, "createdAt"
       `;
       const result: UserViewModel[] = await this.dataSource.query(query, [
         dto.login,
         dto.passwordHash,
         dto.email,
+        dto.isConfirmed,
       ]);
-      return result[0];
+      const user = result[0];
+      return { ...user, id: user.id.toString() };
     } catch (error) {
       if (error.code === '23505') {
         throw new BadRequestException('User already exists');
@@ -31,7 +34,7 @@ export class UsersRepository {
     }
   }
 
-  async deleteUserById(id: number) {
+  async deleteUserById(id: number): Promise<void> {
     const query = `DELETE FROM "Users" WHERE id = $1`;
     await this.dataSource.query(query, [id]);
   }
@@ -39,5 +42,15 @@ export class UsersRepository {
   async findUserByLogin(login: string): Promise<UserDbModel> {
     const query = `SELECT * FROM "Users" WHERE login = $1`;
     return this.dataSource.query(query, [login]);
+  }
+
+  async findUserOrThrowNotFound(id: number): Promise<UserViewModel> {
+    const user: UserViewModel[] = await this.dataSource.query(
+      `SELECT * FROM "Users" WHERE id = $1`,
+      [id],
+    );
+    console.log(user);
+    if (user.length === 0) throw new NotFoundException();
+    return user[0];
   }
 }

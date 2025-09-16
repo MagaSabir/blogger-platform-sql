@@ -1,5 +1,6 @@
 import { UsersRepository } from '../../../infrastructure/users.repository';
 import { CommandHandler } from '@nestjs/cqrs';
+import { UserViewModel } from '../../../api/view-dto/user-view-model';
 
 export class DeleteUserCommand {
   constructor(public id: number) {}
@@ -10,6 +11,9 @@ export class DeleteUserUseCase {
   constructor(private userRepository: UsersRepository) {}
 
   async execute(command: DeleteUserCommand) {
-    await this.userRepository.deleteUserById(command.id);
+    const user: UserViewModel =
+      await this.userRepository.findUserOrThrowNotFound(command.id);
+
+    if (user) await this.userRepository.deleteUserById(command.id);
   }
 }

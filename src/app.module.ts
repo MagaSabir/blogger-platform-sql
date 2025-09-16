@@ -10,7 +10,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
 import { CoreConfig } from './core/config/core.config';
 import { CoreModule } from './core/config/core.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { UsersModule } from './modules/user-accounts/users/users.module';
 
 @Module({
@@ -18,17 +18,17 @@ import { UsersModule } from './modules/user-accounts/users/users.module';
     CoreModule,
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
+      useFactory: (coreConfig: CoreConfig) => ({
         type: 'postgres',
-        host: configService.get<string>('POSTGRES_HOST'),
-        port: configService.get<number>('POSTGRES_PORT'),
-        username: configService.get<string>('POSTGRES_USER'),
-        password: configService.get<string>('POSTGRES_PASSWORD'),
-        database: configService.get<string>('POSTGRES_DB'),
+        host: coreConfig.host,
+        port: coreConfig.db_port,
+        username: coreConfig.username,
+        password: coreConfig.password,
+        database: coreConfig.database,
         autoLoadEntities: false,
         synchronize: false,
       }),
-      inject: [ConfigService],
+      inject: [CoreConfig],
     }),
     configModule,
     ThrottlerModule.forRoot({

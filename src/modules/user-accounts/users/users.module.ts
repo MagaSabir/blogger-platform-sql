@@ -10,11 +10,13 @@ import { LocalStrategy } from '../guards/local/local.strategy';
 import { AuthService } from './application/services/auth.service';
 import { PasswordService } from './application/services/password.service';
 import { GetAllUsersQueryHandler } from './application/queries/get-all-users.query';
+import { UsersConfig } from '../config/users.config';
 
 @Module({
   imports: [CqrsModule],
   controllers: [UsersController],
   providers: [
+    UsersConfig,
     UsersRepository,
     UsersQueryRepository,
     CreateUserUseCase,
