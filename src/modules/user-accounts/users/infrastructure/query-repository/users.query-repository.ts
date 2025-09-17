@@ -15,7 +15,7 @@ export class UsersQueryRepository {
         FROM "Users"
         WHERE ($1::text IS NULL OR login ILIKE '%' || $1 || '%')
            OR ($2::text IS NULL OR email ILIKE '%' || $2 || '%')
-        ORDER BY LOWER("${query.sortBy}") ${query.sortDirection}
+        ORDER BY "${query.sortBy}" ${query.sortDirection}
     LIMIT $3 OFFSET $4
     `;
 

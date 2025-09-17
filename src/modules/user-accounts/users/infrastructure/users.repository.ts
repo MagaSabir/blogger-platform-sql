@@ -49,8 +49,32 @@ export class UsersRepository {
       `SELECT * FROM "Users" WHERE id = $1`,
       [id],
     );
-    console.log(user);
     if (user.length === 0) throw new NotFoundException();
     return user[0];
+  }
+
+  async registerUser(dto: CreateUserType) {
+    const query = `
+          INSERT INTO "Users" ("login", "passwordHash", "email")
+          VALUES ($1, $2, $3) RETURNING id, login, email, "createdAt"
+      `;
+    const result: UserViewModel[] = await this.dataSource.query(query, [
+      dto.login,
+      dto.passwordHash,
+      dto.email,
+    ]);
+    const user = result[0];
+    return { ...user, id: user.id.toString() };
+  }
+
+  async findUserLoginOrEmail(
+    login: string,
+    email: string,
+  ): Promise<UserViewModel> {
+    const user: UserViewModel[] = await this.dataSource.query(
+      `SELECT "login", "passwordHash", "email", "isConfirmed" FROM "Users" WHERE login = $1 OR  email = $2`,
+      [login, email],
+    );
+    return user[0] ?? null;
   }
 }
