@@ -14,31 +14,41 @@ import { UsersConfig } from '../config/users.config';
 import { RegistrationUserUseCase } from './application/usecase/registration-user.usecase';
 import { AuthController } from './api/auth.controller';
 import { JwtService } from '@nestjs/jwt';
+import { LoginUserUseCase } from './application/usecase/login-user.usecase';
+import { SessionRepository } from '../sessions/infrastructure/session-repository';
+import { CoreConfig } from '../../../core/config/core.config';
+import { JwtStrategy } from '../guards/bearer/jwt-strategy';
+import { GetUserQueryHandler } from './application/queries/get-user.query';
+import { AuthQueryRepository } from './infrastructure/query-repository/auth.query-repository';
+
 const commandHandlers = [
   CreateUserUseCase,
   DeleteUserUseCase,
   RegistrationUserUseCase,
+  LoginUserUseCase,
 ];
 
 const refreshTokenConnectionProvider = [
   {
     provide: 'ACCESS-TOKEN',
-    useFactory: (): JwtService => {
+    useFactory: (coreConfig: CoreConfig): JwtService => {
       return new JwtService({
-        secret: 'access-token-secret',
+        secret: coreConfig.accessTokenSecret,
         signOptions: { expiresIn: '10m' },
       });
     },
+    inject: [CoreConfig],
   },
 
   {
     provide: 'REFRESH-TOKEN',
-    useFactory: (): JwtService => {
+    useFactory: (coreConfig: CoreConfig): JwtService => {
       return new JwtService({
-        secret: 'refresh-token-secret',
+        secret: coreConfig.refreshTokenSecret,
         signOptions: { expiresIn: '20m' },
       });
     },
+    inject: [CoreConfig],
   },
 ];
 @Module({
@@ -49,11 +59,15 @@ const refreshTokenConnectionProvider = [
     UsersConfig,
     UsersRepository,
     UsersQueryRepository,
+    AuthQueryRepository,
+    SessionRepository,
     BasicStrategy,
     LocalStrategy,
+    JwtStrategy,
     AuthService,
     PasswordService,
     GetAllUsersQueryHandler,
+    GetUserQueryHandler,
     ...commandHandlers,
   ],
 })

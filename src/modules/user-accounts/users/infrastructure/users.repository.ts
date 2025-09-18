@@ -2,22 +2,23 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import {
   BadRequestException,
+  Injectable,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { UserViewModel } from '../api/view-dto/user-view-model';
 import { UserDbModel } from '../api/view-dto/user-db-model';
 import { CreateUserType } from '../../types/create-user-type';
-
+@Injectable()
 export class UsersRepository {
   constructor(@InjectDataSource() private dataSource: DataSource) {}
 
   async createUser(dto: CreateUserType): Promise<UserViewModel> {
     try {
       const query = `
-          INSERT INTO "Users" ("login", "passwordHash", "email", "isConfirmed")
-          VALUES ($1, $2, $3, $4) RETURNING id, login, email, "createdAt"
-      `;
+            INSERT INTO "Users" ("login", "passwordHash", "email", "isConfirmed")
+            VALUES ($1, $2, $3, $4) RETURNING id, login, email, "createdAt"
+        `;
       const result: UserViewModel[] = await this.dataSource.query(query, [
         dto.login,
         dto.passwordHash,
@@ -39,9 +40,15 @@ export class UsersRepository {
     await this.dataSource.query(query, [id]);
   }
 
-  async findUserByLogin(login: string): Promise<UserDbModel> {
-    const query = `SELECT * FROM "Users" WHERE login = $1`;
-    return this.dataSource.query(query, [login]);
+  async findUserByLoginOrEmailForAuth(
+    loginOrEmail: string,
+  ): Promise<UserDbModel | null> {
+    const query = `SELECT * FROM "Users" WHERE login = $1 OR email = $2`;
+    const result: UserDbModel[] = await this.dataSource.query(query, [
+      loginOrEmail,
+      loginOrEmail,
+    ]);
+    return result.length ? result[0] : null;
   }
 
   async findUserOrThrowNotFound(id: number): Promise<UserViewModel> {
@@ -55,9 +62,9 @@ export class UsersRepository {
 
   async registerUser(dto: CreateUserType) {
     const query = `
-          INSERT INTO "Users" ("login", "passwordHash", "email")
-          VALUES ($1, $2, $3) RETURNING id, login, email, "createdAt"
-      `;
+            INSERT INTO "Users" ("login", "passwordHash", "email")
+            VALUES ($1, $2, $3) RETURNING id, login, email, "createdAt"
+        `;
     const result: UserViewModel[] = await this.dataSource.query(query, [
       dto.login,
       dto.passwordHash,
@@ -75,6 +82,15 @@ export class UsersRepository {
       `SELECT "login", "passwordHash", "email", "isConfirmed" FROM "Users" WHERE login = $1 OR  email = $2`,
       [login, email],
     );
+    return user[0] ?? null;
+  }
+
+  async findUserByCode(code: string) {
+    const user: UserViewModel[] = await this.dataSource.query(
+      `SELECT * FROM "Users" WHERE "confirationCode" = $1`,
+      [code],
+    );
+
     return user[0] ?? null;
   }
 }

@@ -29,6 +29,9 @@ export class CoreConfig {
   @IsEnum(Environments)
   env: string;
 
+  accessTokenSecret: string;
+  refreshTokenSecret: string;
+
   constructor(private configService: ConfigService) {
     this.db_port = Number(this.configService.get('DB_PORT'));
     this.port = Number(this.configService.get('PORT'));
@@ -37,8 +40,11 @@ export class CoreConfig {
     this.password = this.configService.get('DB_PASSWORD') || '';
     this.database = this.configService.get('DB_NAME') || '';
     this.host = this.configService.get('DB_HOST') || '';
+    this.accessTokenSecret =
+      this.configService.get('ACCESS_TOKEN_SECRET') || '';
+    this.refreshTokenSecret =
+      this.configService.get('REFRESH_TOKEN_SECRET') || '';
     this.env = this.configService.get('NODE_ENV') || '';
-    console.log(this.env);
     ConfigValidation.validationConfig(this);
   }
 }
