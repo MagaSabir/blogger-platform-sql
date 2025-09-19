@@ -60,7 +60,7 @@ export class UsersRepository {
     return user[0];
   }
 
-  async registerUser(dto: CreateUserType) {
+  async registerUser(dto: CreateUserType): Promise<UserViewModel> {
     const query = `
             INSERT INTO "Users" ("login", "passwordHash", "email")
             VALUES ($1, $2, $3) RETURNING id, login, email, "createdAt"
@@ -70,7 +70,7 @@ export class UsersRepository {
       dto.passwordHash,
       dto.email,
     ]);
-    const user = result[0];
+    const user: UserViewModel = result[0];
     return { ...user, id: user.id.toString() };
   }
 
@@ -85,12 +85,19 @@ export class UsersRepository {
     return user[0] ?? null;
   }
 
-  async findUserByCode(code: string) {
-    const user: UserViewModel[] = await this.dataSource.query(
-      `SELECT * FROM "Users" WHERE "confirationCode" = $1`,
+  async findUserByCode(code: string): Promise<UserDbModel> {
+    const user: UserDbModel[] = await this.dataSource.query(
+      `SELECT * FROM "Users" WHERE "confirationCode" = $1 AND "isConfirmed = false"`,
       [code],
     );
 
     return user[0] ?? null;
+  }
+
+  async confirmUserEmail(userId: string): Promise<void> {
+    await this.dataSource.query(
+      `UPDATE "Users" SET "isConfirmed" = true, "confirmationCodeExpiration" = NULL WHERE id = $1`,
+      [userId],
+    );
   }
 }

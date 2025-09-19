@@ -8,7 +8,7 @@ export class SendConfirmationEmailHandler
 {
   constructor(private mailService: EmailService) {}
 
-  handle(event: UserRegisteredEvent) {
-    this.mailService.sendConfirmationEmail(event.email, event.code);
+  async handle(event: UserRegisteredEvent) {
+    await this.mailService.sendConfirmationEmail(event.email, event.code);
   }
 }

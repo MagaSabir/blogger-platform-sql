@@ -20,12 +20,14 @@ import { CoreConfig } from '../../../core/config/core.config';
 import { JwtStrategy } from '../guards/bearer/jwt-strategy';
 import { GetUserQueryHandler } from './application/queries/get-user.query';
 import { AuthQueryRepository } from './infrastructure/query-repository/auth.query-repository';
+import { RegistrationConfirmationUseCase } from './application/usecase/registration-confirmation.usecase';
 
 const commandHandlers = [
   CreateUserUseCase,
   DeleteUserUseCase,
   RegistrationUserUseCase,
   LoginUserUseCase,
+  RegistrationConfirmationUseCase,
 ];
 
 const refreshTokenConnectionProvider = [

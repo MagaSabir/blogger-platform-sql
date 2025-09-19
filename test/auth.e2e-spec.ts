@@ -42,4 +42,8 @@ describe('AUTH', () => {
       expect(result.body).toEqual(expect.objectContaining({ userId: '6' }));
     });
   });
+
+  describe('Registration and confirmation', () => {
+    it('should register user and send email', async () => {});
+  });
 });

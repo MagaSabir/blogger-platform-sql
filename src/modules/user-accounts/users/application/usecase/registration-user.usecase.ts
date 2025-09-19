@@ -57,7 +57,6 @@ export class RegistrationUserUseCase
       email: dto.email,
     };
     await this.userRepository.registerUser(user);
-
     this.eventBus.publish(new UserRegisteredEvent(user.email, code));
   }
 }
