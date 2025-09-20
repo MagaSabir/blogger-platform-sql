@@ -1,6 +1,5 @@
 import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
 import { UsersRepository } from '../../infrastructure/users.repository';
-import { UserViewModel } from '../../api/view-dto/user-view-model';
 import { UserDbModel } from '../../api/view-dto/user-db-model';
 import { BadRequestException } from '@nestjs/common';
 import { UserRegisteredEvent } from '../events/user-registered.event';
@@ -41,7 +40,5 @@ export class RegistrationConfirmationUseCase
     }
 
     await this.userRepository.confirmUserEmail(user.id);
-    debugger;
-    this.eventBus.publish(new UserRegisteredEvent(user.email, command.code));
   }
 }

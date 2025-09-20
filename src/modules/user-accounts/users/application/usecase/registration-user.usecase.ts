@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { UserRegisteredEvent } from '../events/user-registered.event';
 import { BadRequestException } from '@nestjs/common';
 import { UserViewModel } from '../../api/view-dto/user-view-model';
+import { EmailService } from '../../../../notification/email.service';
 
 export class RegistrationUserCommand {
   constructor(public dto: CreateUserDto) {}
@@ -19,6 +20,7 @@ export class RegistrationUserUseCase
     private passwordService: PasswordService,
     private eventBus: EventBus,
     private userRepository: UsersRepository,
+    private mailService: EmailService,
   ) {}
 
   async execute({ dto }: RegistrationUserCommand) {
@@ -55,8 +57,10 @@ export class RegistrationUserUseCase
       login: dto.login,
       passwordHash,
       email: dto.email,
+      confirmationCode: code,
     };
     await this.userRepository.registerUser(user);
-    this.eventBus.publish(new UserRegisteredEvent(user.email, code));
+    // this.eventBus.publish(new UserRegisteredEvent(user.email, code));
+    await this.mailService.sendConfirmationEmail(user.email, code);
   }
 }

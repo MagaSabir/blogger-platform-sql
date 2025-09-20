@@ -7,7 +7,7 @@ export class EmailService {
   constructor(private emailService: MailerService) {}
   async sendConfirmationEmail(email: string, code: string) {
     await this.emailService.sendMail({
-      from: `"My App" ${this.EMAIl}`,
+      // from: `"My App" ${this.EMAIl}`,
       to: email,
       subject: 'Email Confirmation',
       template: 'confirm',

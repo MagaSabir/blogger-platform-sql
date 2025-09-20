@@ -62,13 +62,14 @@ export class UsersRepository {
 
   async registerUser(dto: CreateUserType): Promise<UserViewModel> {
     const query = `
-            INSERT INTO "Users" ("login", "passwordHash", "email")
-            VALUES ($1, $2, $3) RETURNING id, login, email, "createdAt"
+            INSERT INTO "Users" ("login", "passwordHash", "email", "confirmationCode")
+            VALUES ($1, $2, $3, $4) RETURNING id, login, email, "createdAt"
         `;
     const result: UserViewModel[] = await this.dataSource.query(query, [
       dto.login,
       dto.passwordHash,
       dto.email,
+      dto.confirmationCode,
     ]);
     const user: UserViewModel = result[0];
     return { ...user, id: user.id.toString() };
@@ -87,7 +88,7 @@ export class UsersRepository {
 
   async findUserByCode(code: string): Promise<UserDbModel> {
     const user: UserDbModel[] = await this.dataSource.query(
-      `SELECT * FROM "Users" WHERE "confirationCode" = $1 AND "isConfirmed = false"`,
+      `SELECT * FROM "Users" WHERE "confirmationCode" = $1 AND "isConfirmed" = false`,
       [code],
     );
 

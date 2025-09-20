@@ -3,4 +3,5 @@ export type CreateUserType = {
   email: string;
   passwordHash: string;
   isConfirmed?: boolean;
+  confirmationCode?: string;
 };
