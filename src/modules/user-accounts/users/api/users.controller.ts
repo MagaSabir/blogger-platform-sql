@@ -44,7 +44,6 @@ export class UsersController {
   async getUsers(
     @Query() query: UsersQueryParams,
   ): Promise<BasePaginatedResponse<UserViewModel>> {
-    console.log(query);
     return await this.queryBus.execute<
       GetAllUsersQuery,
       BasePaginatedResponse<UserViewModel>

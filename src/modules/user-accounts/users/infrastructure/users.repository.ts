@@ -75,7 +75,7 @@ export class UsersRepository {
     return { ...user, id: user.id.toString() };
   }
 
-  async findUserLoginOrEmail(
+  async findUserByLoginOrEmail(
     login: string,
     email: string,
   ): Promise<UserViewModel> {
@@ -100,5 +100,37 @@ export class UsersRepository {
       `UPDATE "Users" SET "isConfirmed" = true, "confirmationCodeExpiration" = NULL WHERE id = $1`,
       [userId],
     );
+  }
+
+  async findIsNotConfirmedUsersByEmail(
+    email: string,
+  ): Promise<UserDbModel | null> {
+    const user: UserDbModel[] = await this.dataSource.query(
+      `SELECT * FROM "Users" WHERE email = $1 AND "isConfirmed" = false`,
+      [email],
+    );
+    return user[0] ?? null;
+  }
+
+  async updateConfirmationCode(code: string, email: string) {
+    await this.dataSource.query(
+      `UPDATE "Users"
+       SET
+           "confirmationCode" = $1,
+           "confirmationCodeExpiration" = NOW() + INTERVAL '24 hours'
+       WHERE email = $2`,
+      [code, email],
+    );
+  }
+
+  async updatePassword(
+    code: string,
+    passwordHash: string,
+  ): Promise<UserDbModel> {
+    const result: UserDbModel[] = await this.dataSource.query(
+      `UPDATE "Users" SET "passwordHash" = $1 WHERE "confirmationCode" = $2`,
+      [passwordHash, code],
+    );
+    return result[0] ?? null;
   }
 }

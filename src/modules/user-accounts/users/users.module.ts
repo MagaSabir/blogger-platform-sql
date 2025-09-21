@@ -21,6 +21,9 @@ import { JwtStrategy } from '../guards/bearer/jwt-strategy';
 import { GetUserQueryHandler } from './application/queries/get-user.query';
 import { AuthQueryRepository } from './infrastructure/query-repository/auth.query-repository';
 import { RegistrationConfirmationUseCase } from './application/usecase/registration-confirmation.usecase';
+import { ResendConfirmationEmailUseCase } from './application/usecase/resend-confirmation-email.usecase';
+import { PasswordRecoveryUseCase } from './application/usecase/password-recovery.usecase';
+import { NewPasswordUseCase } from './application/usecase/new-password.usecase';
 
 const commandHandlers = [
   CreateUserUseCase,
@@ -28,6 +31,9 @@ const commandHandlers = [
   RegistrationUserUseCase,
   LoginUserUseCase,
   RegistrationConfirmationUseCase,
+  ResendConfirmationEmailUseCase,
+  PasswordRecoveryUseCase,
+  NewPasswordUseCase,
 ];
 
 const refreshTokenConnectionProvider = [

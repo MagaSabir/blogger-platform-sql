@@ -9,6 +9,6 @@ export class TestingController {
   @Delete('all-data')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteAll() {
-    await this.dataSource.query(`TRUNCATE TABLE "Users" RESTART IDENTITY`);
+    await this.dataSource.query(`DELETE FROM "Users"`);
   }
 }

@@ -3,7 +3,6 @@ import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
 import { PasswordService } from '../services/password.service';
 import { UsersRepository } from '../../infrastructure/users.repository';
 import { v4 as uuidv4 } from 'uuid';
-import { UserRegisteredEvent } from '../events/user-registered.event';
 import { BadRequestException } from '@nestjs/common';
 import { UserViewModel } from '../../api/view-dto/user-view-model';
 import { EmailService } from '../../../../notification/email.service';
@@ -25,7 +24,7 @@ export class RegistrationUserUseCase
 
   async execute({ dto }: RegistrationUserCommand) {
     const existsUser: UserViewModel =
-      await this.userRepository.findUserLoginOrEmail(dto.login, dto.email);
+      await this.userRepository.findUserByLoginOrEmail(dto.login, dto.email);
     if (existsUser) {
       if (existsUser.login === dto.login) {
         throw new BadRequestException({

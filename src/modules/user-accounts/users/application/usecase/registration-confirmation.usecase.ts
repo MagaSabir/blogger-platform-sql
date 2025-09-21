@@ -2,7 +2,6 @@ import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
 import { UsersRepository } from '../../infrastructure/users.repository';
 import { UserDbModel } from '../../api/view-dto/user-db-model';
 import { BadRequestException } from '@nestjs/common';
-import { UserRegisteredEvent } from '../events/user-registered.event';
 import { EmailService } from '../../../../notification/email.service';
 
 export class RegistrationConfirmationCommand {
@@ -26,7 +25,7 @@ export class RegistrationConfirmationUseCase
 
     if (!user || user.isConfirmed) {
       throw new BadRequestException({
-        errorsMessage: [
+        errorsMessages: [
           {
             message: 'Email is confirmed or not Found',
             field: 'code',
