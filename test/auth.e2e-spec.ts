@@ -16,7 +16,6 @@ describe('AUTH', () => {
     Buffer.from(basicAuthCredentials).toString('base64');
 
   let confirmationCode;
-  console.log(confirmationCode);
 
   beforeAll(async () => {
     process.env.NODE_ENV = 'testing';

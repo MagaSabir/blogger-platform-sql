@@ -8,14 +8,14 @@ export class UsersQueryRepository {
   constructor(@InjectDataSource() private dataSource: DataSource) {}
 
   async getUsers(
-    query: UsersQueryParams,
+    queryParams: UsersQueryParams,
   ): Promise<BasePaginatedResponse<UserViewModel>> {
-    const queryD = `
+    const query = `
         SELECT id::text, login, email, "createdAt"
         FROM "Users"
         WHERE ($1::text IS NULL OR login ILIKE '%' || $1 || '%')
            OR ($2::text IS NULL OR email ILIKE '%' || $2 || '%')
-        ORDER BY "${query.sortBy}" ${query.sortDirection}
+        ORDER BY "${queryParams.sortBy}" ${queryParams.sortDirection}
     LIMIT $3 OFFSET $4
     `;
 
@@ -27,23 +27,23 @@ export class UsersQueryRepository {
     `;
 
     const [items, totalCountResult] = await Promise.all([
-      this.dataSource.query<UserViewModel[]>(queryD, [
-        query.searchLoginTerm,
-        query.searchEmailTerm,
-        query.pageSize,
-        query.calculateSkip(),
+      this.dataSource.query<UserViewModel[]>(query, [
+        queryParams.searchLoginTerm,
+        queryParams.searchEmailTerm,
+        queryParams.pageSize,
+        queryParams.calculateSkip(),
       ]),
-      this.dataSource.query<{ totalCount: string }>(count, [
-        query.searchLoginTerm,
-        query.searchEmailTerm,
+      this.dataSource.query<{ totalCount: number }>(count, [
+        queryParams.searchLoginTerm,
+        queryParams.searchEmailTerm,
       ]),
     ]);
     const totalCount: number = parseInt(totalCountResult[0].totalCount);
 
     return {
-      pagesCount: Math.ceil(totalCount / query.pageSize),
-      page: query.pageNumber,
-      pageSize: query.pageSize,
+      pagesCount: Math.ceil(totalCount / queryParams.pageSize),
+      page: queryParams.pageNumber,
+      pageSize: queryParams.pageSize,
       totalCount,
       items,
     };
