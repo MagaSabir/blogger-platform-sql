@@ -26,6 +26,10 @@ describe('AppController (e2e)', () => {
     // await request(app.getHttpServer()).delete('/testing/all-data');
   });
 
+  afterAll(async () => {
+    await app.close();
+  });
+
   // it('/ (POST)', async () => {
   //   for (let i = 0; i < 3; i++) {
   //     const user = await request(app.getHttpServer())

@@ -11,7 +11,7 @@ import { CoreConfig } from './core/config/core.config';
 import { CoreModule } from './core/config/core.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
-import { UsersModule } from './modules/user-accounts/users/users.module';
+import { UsersModule } from './modules/user-accounts/users.module';
 
 @Module({
   imports: [

@@ -33,7 +33,7 @@ export class SessionRepository {
     userId: string,
     deviceId: string,
   ): Promise<SessionsType | null> {
-    const session: SessionsType = await this.dataSource.query(
+    const session: SessionsType[] = await this.dataSource.query(
       `SELECT * FROM "Sessions" WHERE "userId" = $1 AND "deviceId" = $2`,
       [userId, deviceId],
     );
