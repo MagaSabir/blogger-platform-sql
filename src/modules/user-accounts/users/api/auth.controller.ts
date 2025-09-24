@@ -27,6 +27,10 @@ import { ResendConfirmationEmailCommand } from '../application/usecase/resend-co
 import { PasswordRecoveryCommand } from '../application/usecase/password-recovery.usecase';
 import { NewPasswordCommand } from '../application/usecase/new-password.usecase';
 import { InputNewPasswordDto } from './input-dto/input-password-validation';
+import { RefreshTokenGuard } from '../../guards/refresh-token/resfresh-token.guard';
+import { RefreshTokenCommand } from '../application/usecase/refresh-token.usecase';
+import { GetRefreshToken } from '../../decorators/get-refresh-token';
+import { LogoutCommand } from '../application/usecase/logout.usecase';
 
 @Controller('auth')
 @UseGuards(ThrottlerGuard)
