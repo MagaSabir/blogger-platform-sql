@@ -35,6 +35,6 @@ export class ResendConfirmationEmailUseCase
     const code: string = uuidv4();
 
     await this.usersRepository.updateConfirmationCode(code, user.email);
-    await this.emailService.sendConfirmationEmail(user.email, code);
+    this.emailService.sendConfirmationEmail(user.email, code);
   }
 }

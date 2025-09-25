@@ -27,6 +27,9 @@ import { NewPasswordUseCase } from './users/application/usecase/new-password.use
 import { LogoutUseCase } from './users/application/usecase/logout.usecase';
 import { RefreshTokenUseCase } from './users/application/usecase/refresh-token.usecase';
 import { SecurityDevicesController } from './security-devices/api/security-devices.controller';
+import { GetDevicesQueryHandler } from './security-devices/queries/get-devices.query';
+import { DeleteOtherActiveSessionUseCase } from './security-devices/usecases/delete-other-active-session.usecase';
+import { DeleteSessionUseCase } from './security-devices/usecases/delete-sesion.usecase';
 
 const commandHandlers = [
   CreateUserUseCase,
@@ -39,6 +42,8 @@ const commandHandlers = [
   NewPasswordUseCase,
   LogoutUseCase,
   RefreshTokenUseCase,
+  DeleteOtherActiveSessionUseCase,
+  DeleteSessionUseCase,
 ];
 
 const refreshTokenConnectionProvider = [
@@ -47,7 +52,7 @@ const refreshTokenConnectionProvider = [
     useFactory: (coreConfig: CoreConfig): JwtService => {
       return new JwtService({
         secret: coreConfig.accessTokenSecret,
-        signOptions: { expiresIn: '10m' },
+        signOptions: { expiresIn: '10s' },
       });
     },
     inject: [CoreConfig],
@@ -58,7 +63,7 @@ const refreshTokenConnectionProvider = [
     useFactory: (coreConfig: CoreConfig): JwtService => {
       return new JwtService({
         secret: coreConfig.refreshTokenSecret,
-        signOptions: { expiresIn: '20m' },
+        signOptions: { expiresIn: '20s' },
       });
     },
     inject: [CoreConfig],
@@ -80,6 +85,7 @@ const refreshTokenConnectionProvider = [
     AuthService,
     PasswordService,
     GetAllUsersQueryHandler,
+    GetDevicesQueryHandler,
     GetUserQueryHandler,
     ...commandHandlers,
   ],

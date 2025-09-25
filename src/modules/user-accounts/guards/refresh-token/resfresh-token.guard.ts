@@ -21,16 +21,15 @@ export class RefreshTokenGuard implements CanActivate {
       .switchToHttp()
       .getRequest<AuthenticatedRequest>();
     const token: string = request.cookies['refreshToken'];
-    console.log(token);
+
     if (!token) {
       throw new UnauthorizedException();
     }
 
     try {
       const payload: TokenPayloadType = this.refreshTokenContext.verify(token);
-      console.log(payload);
       const sessions: SessionsType | null =
-        await this.sessionRepository.getSession(
+        await this.sessionRepository.findSession(
           payload.userId,
           payload.deviceId,
         );

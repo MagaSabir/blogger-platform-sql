@@ -32,6 +32,7 @@ export class RefreshTokenUseCase
     });
     const newSessionToken: TokenPayloadType =
       this.refreshTokenContext.verify(refreshToken);
+    console.log(new Date(newSessionToken.exp));
     await this.sessionRepository.updateSessionToken(newSessionToken);
     return { accessToken, refreshToken };
   }
