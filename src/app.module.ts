@@ -12,6 +12,8 @@ import { CoreModule } from './core/config/core.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { UsersModule } from './modules/user-accounts/users.module';
+import { BloggerPlatformModule } from './modules/blogger-platform/blogger-platform.module';
+import { throttlerSetup } from './setup/throtller.setup';
 
 @Module({
   imports: [
@@ -31,17 +33,11 @@ import { UsersModule } from './modules/user-accounts/users.module';
       inject: [CoreConfig],
     }),
     configModule,
-    ThrottlerModule.forRoot({
-      throttlers: [
-        {
-          ttl: 10000,
-          limit: 5,
-        },
-      ],
-    }),
+    ThrottlerModule.forRoot(throttlerSetup),
     TestingModule,
     NotificationModule,
     UsersModule,
+    BloggerPlatformModule,
   ],
   controllers: [AppController],
   providers: [
