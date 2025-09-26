@@ -1,7 +1,16 @@
+import { InjectDataSource } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
+
 export class BlogsQueryRepository {
-  constructor() {}
+  constructor(@InjectDataSource() private dataSource: DataSource) {}
 
-  async getBlogs() {}
+  async getBlogs(): Promise<object> {
+    const query = `SELECT * FROM "Blogs"`;
+    return this.dataSource.query(query);
+  }
 
-  async getBlog() {}
+  async getBlog(id: string): Promise<object> {
+    const query = `SELECT * FROM "Blogs" WHERE id = $1`;
+    return this.dataSource.query(query, [id]);
+  }
 }
