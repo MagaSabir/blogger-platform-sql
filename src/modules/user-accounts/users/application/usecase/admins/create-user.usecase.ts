@@ -4,6 +4,7 @@ import { UsersRepository } from '../../../infrastructure/users.repository';
 import { UserViewModel } from '../../../api/view-dto/user-view-model';
 import { PasswordService } from '../../services/password.service';
 import { UsersConfig } from '../../../../config/users.config';
+import { BadRequestException } from '@nestjs/common';
 
 export class CreateUserCommand {
   constructor(public dto: CreateUserDto) {}
@@ -17,7 +18,15 @@ export class CreateUserUseCase implements ICommandHandler<CreateUserCommand> {
     private userConfig: UsersConfig,
   ) {}
   async execute(command: CreateUserCommand): Promise<UserViewModel> {
-    const passwordHash = await this.passwordService.hash(command.dto.password);
+    const user: UserViewModel =
+      await this.usersRepository.findUserByLoginOrEmail(
+        command.dto.login,
+        command.dto.email,
+      );
+    if (user) throw new BadRequestException('User already exists');
+    const passwordHash: string = await this.passwordService.hash(
+      command.dto.password,
+    );
     const dto = {
       login: command.dto.login,
       email: command.dto.email,

@@ -1,38 +1,27 @@
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import {
-  BadRequestException,
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { UserViewModel } from '../api/view-dto/user-view-model';
 import { UserDbModel } from '../api/view-dto/user-db-model';
 import { CreateUserType } from '../../types/create-user-type';
+
 @Injectable()
 export class UsersRepository {
   constructor(@InjectDataSource() private dataSource: DataSource) {}
 
   async createUser(dto: CreateUserType): Promise<UserViewModel> {
-    try {
-      const query = `
+    const query = `
             INSERT INTO "Users" ("login", "passwordHash", "email", "isConfirmed")
             VALUES ($1, $2, $3, $4) RETURNING id, login, email, "createdAt"
         `;
-      const result: UserViewModel[] = await this.dataSource.query(query, [
-        dto.login,
-        dto.passwordHash,
-        dto.email,
-        dto.isConfirmed,
-      ]);
-      const user = result[0];
-      return { ...user, id: user.id.toString() };
-    } catch (error) {
-      if (error.code === '23505') {
-        throw new BadRequestException('User already exists');
-      }
-      throw new InternalServerErrorException(error.message);
-    }
+    const result: UserViewModel[] = await this.dataSource.query(query, [
+      dto.login,
+      dto.passwordHash,
+      dto.email,
+      dto.isConfirmed,
+    ]);
+    const user: UserViewModel = result[0];
+    return { ...user, id: user.id.toString() };
   }
 
   async deleteUserById(id: number): Promise<void> {
@@ -117,7 +106,7 @@ export class UsersRepository {
       `UPDATE "Users"
        SET
            "confirmationCode" = $1,
-           "confirmationCodeExpiration" = NOW() + INTERVAL '24 hours'
+           "confirmationCodeExpiration" = NOW() + INTERVAL '24 hours' // генерировать в сервисе и передать сюда.
        WHERE email = $2`,
       [code, email],
     );
