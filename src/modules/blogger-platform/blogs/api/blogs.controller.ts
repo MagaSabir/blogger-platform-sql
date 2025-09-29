@@ -1,8 +1,10 @@
-import { Controller, Get, Param, Req } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { GetBlogsQuery } from '../application/queries/get-blogs.query';
 import { GetBlogQuery } from '../application/queries/get-blog.query';
 import { Request } from 'express';
+import { BlogsQueryParams } from './input-validation-dto/blogs-query-params';
+import { BlogViewModel } from '../../../user-accounts/users/application/queries/view-dto/blog.view-model';
 
 @Controller('blogs')
 export class BlogsController {
@@ -12,9 +14,8 @@ export class BlogsController {
   ) {}
 
   @Get()
-  async getBlogs(@Req() request: Request): Promise<object> {
-    console.log(request.httpVersion);
-    return await this.queryBus.execute(new GetBlogsQuery());
+  async getBlogs(@Query() query: BlogsQueryParams): Promise<BlogViewModel> {
+    return await this.queryBus.execute(new GetBlogsQuery(query));
   }
 
   @Get(':id')

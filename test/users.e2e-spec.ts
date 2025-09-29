@@ -12,7 +12,7 @@ describe('AppController (e2e)', () => {
     Buffer.from(basicAuthCredentials).toString('base64');
   const users: [] = [];
   beforeAll(async () => {
-    process.env.NODE_ENV = 'testing';
+    process.env.NODE_ENV = 'testing.local';
 
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
