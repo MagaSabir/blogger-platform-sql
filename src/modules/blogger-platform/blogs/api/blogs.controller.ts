@@ -8,10 +8,7 @@ import { BlogViewModel } from '../../../user-accounts/users/application/queries/
 
 @Controller('blogs')
 export class BlogsController {
-  constructor(
-    private queryBus: QueryBus,
-    private commandBus: CommandBus,
-  ) {}
+  constructor(private queryBus: QueryBus) {}
 
   @Get()
   async getBlogs(@Query() query: BlogsQueryParams): Promise<BlogViewModel> {
