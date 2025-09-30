@@ -10,8 +10,19 @@ import { PostsQueryRepository } from './posts/infrastructure/posts.query-reposit
 import { GetAllPostByIdQueryHandler } from './blogs/application/queries/get-all-post-by-id.query';
 import { GetAllPostsQueryHandler } from './posts/application/queries/get-all-posts.query';
 import { GetPostQueryHandler } from './posts/application/queries/get-post.query';
+import { SaBlogsController } from './blogs/api/admin/sa.blogs.controller';
+import { CreateBlogUseCase } from './blogs/application/usecases/create-blog.usecase';
+import { UpdateBlogUseCase } from './blogs/application/usecases/update-blog.usecase';
+import { DeleteBlogUseCase } from './blogs/application/usecases/delete-blog.usecase';
+import { CreatePostByBlogIdUseCase } from './blogs/application/usecases/create-post-by-blog-id.usecase';
 
-const commandHandlers = [];
+const commandHandlers = [
+  CreateBlogUseCase,
+  UpdateBlogUseCase,
+  UpdateBlogUseCase,
+  DeleteBlogUseCase,
+  CreatePostByBlogIdUseCase,
+];
 const queryHandlers = [
   GetBlogQueryHandler,
   GetBlogsQueryHandler,
@@ -27,7 +38,8 @@ const queryHandlers = [
     BlogsQueryRepository,
     BlogsRepository,
     PostsQueryRepository,
+    BlogsRepository,
   ],
-  controllers: [BlogsController, PostsController],
+  controllers: [BlogsController, PostsController, SaBlogsController],
 })
 export class BloggerPlatformModule {}

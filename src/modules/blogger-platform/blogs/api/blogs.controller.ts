@@ -1,10 +1,16 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
-import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import {
+  Controller,
+  Get,
+  HttpStatus,
+  Param,
+  ParseUUIDPipe,
+  Query,
+} from '@nestjs/common';
+import { QueryBus } from '@nestjs/cqrs';
 import { GetBlogsQuery } from '../application/queries/get-blogs.query';
 import { GetBlogQuery } from '../application/queries/get-blog.query';
 import { BlogsQueryParams } from './input-validation-dto/blogs-query-params';
 import { BlogViewModel } from '../application/queries/view-dto/blog.view-model';
-import { InputIdValidation } from './input-validation-dto/input-id-validation';
 import { BasePaginatedResponse } from '../../../../core/base-paginated-response';
 import { GetAllPostByIdQuery } from '../application/queries/get-all-post-by-id.query';
 import { PostQueryParams } from '../../posts/api/input-dto/post-query-params';
@@ -21,17 +27,25 @@ export class BlogsController {
   }
 
   @Get(':id')
-  async getBlog(@Param() params: InputIdValidation): Promise<BlogViewModel> {
-    return await this.queryBus.execute(new GetBlogQuery(params.id));
+  async getBlog(
+    @Param(
+      'id',
+      new ParseUUIDPipe({ errorHttpStatusCode: HttpStatus.NOT_FOUND }),
+    )
+    id: string,
+  ): Promise<BlogViewModel> {
+    return await this.queryBus.execute(new GetBlogQuery(id));
   }
 
   @Get(':id/posts')
   async getPostsByBlogId(
-    @Param() params: InputIdValidation,
+    @Param(
+      'id',
+      new ParseUUIDPipe({ errorHttpStatusCode: HttpStatus.NOT_FOUND }),
+    )
+    id: string,
     @Query() query: PostQueryParams,
   ): Promise<object> {
-    return await this.queryBus.execute(
-      new GetAllPostByIdQuery(params.id, query),
-    );
+    return await this.queryBus.execute(new GetAllPostByIdQuery(id, query));
   }
 }
