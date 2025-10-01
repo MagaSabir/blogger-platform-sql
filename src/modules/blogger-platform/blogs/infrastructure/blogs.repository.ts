@@ -3,8 +3,6 @@ import { DataSource } from 'typeorm';
 import { CreateBlogDto } from '../dto/create-blog-dto';
 import { BlogViewModel } from '../application/queries/view-dto/blog.view-model';
 import { CreateBlogInputDto } from '../api/input-validation-dto/create-blog-input-dto';
-import { CreatePostByBlogId } from '../dto/create-post-by-blog-id.dto';
-import { PostViewModel } from '../../posts/application/view-dto/post-view-model';
 
 export class BlogsRepository {
   constructor(@InjectDataSource() private dataSource: DataSource) {}
@@ -46,19 +44,5 @@ export class BlogsRepository {
 
   async deleteBlog(id: string) {
     await this.dataSource.query(`DELETE FROM "Blogs" WHERE id = $1`, [id]);
-  }
-
-  async createPostByBlogId(
-    dto: CreatePostByBlogId,
-    blogId: string,
-    blogName: string,
-  ): Promise<PostViewModel> {
-    const result: PostViewModel[] = await this.dataSource.query(
-      `INSERT INTO "Posts" (title, "shortDescription", content, "blogId", "blogName")
-      VALUES  ($1, $2, $3, $4, $5)
-      RETURNING *`,
-      [dto.title, dto.shortDescription, dto.content, blogId, blogName],
-    );
-    return result[0] ?? null;
   }
 }

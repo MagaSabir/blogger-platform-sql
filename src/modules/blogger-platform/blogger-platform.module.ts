@@ -6,7 +6,7 @@ import { BlogsQueryRepository } from './blogs/infrastructure/query-repository/bl
 import { BlogsRepository } from './blogs/infrastructure/blogs.repository';
 import { CqrsModule } from '@nestjs/cqrs';
 import { PostsController } from './posts/api/posts.controller';
-import { PostsQueryRepository } from './posts/infrastructure/posts.query-repository';
+import { PostsQueryRepository } from './posts/infrastructure/query-repository/posts.query-repository';
 import { GetAllPostByIdQueryHandler } from './blogs/application/queries/get-all-post-by-id.query';
 import { GetAllPostsQueryHandler } from './posts/application/queries/get-all-posts.query';
 import { GetPostQueryHandler } from './posts/application/queries/get-post.query';
@@ -15,6 +15,8 @@ import { CreateBlogUseCase } from './blogs/application/usecases/create-blog.usec
 import { UpdateBlogUseCase } from './blogs/application/usecases/update-blog.usecase';
 import { DeleteBlogUseCase } from './blogs/application/usecases/delete-blog.usecase';
 import { CreatePostByBlogIdUseCase } from './blogs/application/usecases/create-post-by-blog-id.usecase';
+import { PostsRepository } from './posts/infrastructure/posts.repository';
+import { UpdatePostByBlogIdUseCase } from './blogs/application/usecases/update-post-by-blog-id.usecase';
 
 const commandHandlers = [
   CreateBlogUseCase,
@@ -22,6 +24,7 @@ const commandHandlers = [
   UpdateBlogUseCase,
   DeleteBlogUseCase,
   CreatePostByBlogIdUseCase,
+  UpdatePostByBlogIdUseCase,
 ];
 const queryHandlers = [
   GetBlogQueryHandler,
@@ -39,6 +42,7 @@ const queryHandlers = [
     BlogsRepository,
     PostsQueryRepository,
     BlogsRepository,
+    PostsRepository,
   ],
   controllers: [BlogsController, PostsController, SaBlogsController],
 })

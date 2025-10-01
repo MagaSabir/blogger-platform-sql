@@ -25,6 +25,7 @@ import { DeleteBlogCommand } from '../../application/usecases/delete-blog.usecas
 import { CreatePostInputDto } from '../input-validation-dto/create-post-input-dto';
 import { CreatePostByBlogIdCommand } from '../../application/usecases/create-post-by-blog-id.usecase';
 import { PostViewModel } from '../../../posts/application/view-dto/post-view-model';
+import { UpdatePostByBlogIdCommand } from '../../application/usecases/update-post-by-blog-id.usecase';
 
 @Controller('sa/blogs')
 @UseGuards(BasicAuthGuard)
@@ -83,5 +84,14 @@ export class SaBlogsController {
     @Body() body: CreatePostInputDto,
   ): Promise<PostViewModel> {
     return this.commandBus.execute(new CreatePostByBlogIdCommand(body, id));
+  }
+
+  @Put(':blogId/posts/:postId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async updatePostByBlogId(
+    @Body() body: CreatePostInputDto,
+    @Param() params: { blogId: string; postId: string },
+  ) {
+    await this.commandBus.execute(new UpdatePostByBlogIdCommand(body, params));
   }
 }

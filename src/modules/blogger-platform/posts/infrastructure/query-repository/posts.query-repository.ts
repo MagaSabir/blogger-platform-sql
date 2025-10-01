@@ -1,8 +1,8 @@
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { PostQueryParams } from '../api/input-dto/post-query-params';
-import { PostViewModel } from '../application/view-dto/post-view-model';
-import { BasePaginatedResponse } from '../../../../core/base-paginated-response';
+import { PostQueryParams } from '../../api/input-dto/post-query-params';
+import { PostViewModel } from '../../application/view-dto/post-view-model';
+import { BasePaginatedResponse } from '../../../../../core/base-paginated-response';
 
 export class PostsQueryRepository {
   constructor(@InjectDataSource() private dataSource: DataSource) {}
