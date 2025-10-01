@@ -23,9 +23,12 @@ import { CreateBlogCommand } from '../../application/usecases/create-blog.usecas
 import { UpdateBlogCommand } from '../../application/usecases/update-blog.usecase';
 import { DeleteBlogCommand } from '../../application/usecases/delete-blog.usecase';
 import { CreatePostInputDto } from '../input-validation-dto/create-post-input-dto';
-import { CreatePostByBlogIdCommand } from '../../application/usecases/create-post-by-blog-id.usecase';
+import { CreateBlogPostCommand } from '../../application/usecases/create-blog-post-use.case';
 import { PostViewModel } from '../../../posts/application/view-dto/post-view-model';
-import { UpdatePostByBlogIdCommand } from '../../application/usecases/update-post-by-blog-id.usecase';
+import { UpdateBlogPostCommand } from '../../application/usecases/update-blog-post-use.case';
+import { DeleteBlogPostCommand } from '../../application/usecases/delete-blog-post.usecase';
+import { PostQueryParams } from '../../../posts/api/input-dto/post-query-params';
+import { GetBlogPostsQuery } from '../../application/queries/get-blog-posts.query';
 
 @Controller('sa/blogs')
 @UseGuards(BasicAuthGuard)
@@ -83,7 +86,7 @@ export class SaBlogsController {
     id: string,
     @Body() body: CreatePostInputDto,
   ): Promise<PostViewModel> {
-    return this.commandBus.execute(new CreatePostByBlogIdCommand(body, id));
+    return this.commandBus.execute(new CreateBlogPostCommand(body, id));
   }
 
   @Put(':blogId/posts/:postId')
@@ -91,7 +94,23 @@ export class SaBlogsController {
   async updatePostByBlogId(
     @Body() body: CreatePostInputDto,
     @Param() params: { blogId: string; postId: string },
-  ) {
-    await this.commandBus.execute(new UpdatePostByBlogIdCommand(body, params));
+  ): Promise<void> {
+    await this.commandBus.execute(new UpdateBlogPostCommand(body, params));
+  }
+
+  @Delete(':blogId/posts/:postId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deletePostByBlogId(
+    @Param() params: { blogId: string; postId: string },
+  ): Promise<void> {
+    await this.commandBus.execute(new DeleteBlogPostCommand(params));
+  }
+
+  @Get(':id')
+  async getBlogPost(
+    @Query() query: PostQueryParams,
+    @Param('id') id: string,
+  ): Promise<BasePaginatedResponse<PostViewModel>> {
+    return this.queryBus.execute(new GetBlogPostsQuery(query, id));
   }
 }

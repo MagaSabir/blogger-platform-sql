@@ -14,17 +14,20 @@ import { SaBlogsController } from './blogs/api/admin/sa.blogs.controller';
 import { CreateBlogUseCase } from './blogs/application/usecases/create-blog.usecase';
 import { UpdateBlogUseCase } from './blogs/application/usecases/update-blog.usecase';
 import { DeleteBlogUseCase } from './blogs/application/usecases/delete-blog.usecase';
-import { CreatePostByBlogIdUseCase } from './blogs/application/usecases/create-post-by-blog-id.usecase';
+import { CreateBlogPostUseCase } from './blogs/application/usecases/create-blog-post-use.case';
 import { PostsRepository } from './posts/infrastructure/posts.repository';
-import { UpdatePostByBlogIdUseCase } from './blogs/application/usecases/update-post-by-blog-id.usecase';
+import { UpdateBlogPostUseCase } from './blogs/application/usecases/update-blog-post-use.case';
+import { GetBlogPostsQueryHandler } from './blogs/application/queries/get-blog-posts.query';
+import { DeleteBlogPostUseCase } from './blogs/application/usecases/delete-blog-post.usecase';
 
 const commandHandlers = [
   CreateBlogUseCase,
   UpdateBlogUseCase,
   UpdateBlogUseCase,
   DeleteBlogUseCase,
-  CreatePostByBlogIdUseCase,
-  UpdatePostByBlogIdUseCase,
+  CreateBlogPostUseCase,
+  UpdateBlogPostUseCase,
+  DeleteBlogPostUseCase,
 ];
 const queryHandlers = [
   GetBlogQueryHandler,
@@ -32,6 +35,7 @@ const queryHandlers = [
   GetAllPostByIdQueryHandler,
   GetAllPostsQueryHandler,
   GetPostQueryHandler,
+  GetBlogPostsQueryHandler,
 ];
 @Module({
   imports: [CqrsModule],

@@ -39,4 +39,32 @@ export class PostsQueryRepository {
     );
     return result[0] ?? null;
   }
+
+  async getBlogPosts(
+    queryParams: PostQueryParams,
+    blogId: string,
+  ): Promise<BasePaginatedResponse<PostViewModel>> {
+    const query = `SELECT * FROM "Posts" WHERE "blogId" = $1
+                   ORDER BY "${queryParams.sortBy}" ${queryParams.sortDirection}
+                   LIMIT $2 OFFSET $3`;
+
+    const count: { totalCount: string }[] = await this.dataSource.query(
+      `SELECT COUNT(*) as "totalCount" FROM "Posts" WHERE "blogId" = $4`,
+    );
+    const items: PostViewModel[] = await this.dataSource.query(query, [
+      blogId,
+      queryParams.pageSize,
+      queryParams.calculateSkip(),
+      blogId,
+    ]);
+    const totalCount: number = parseInt(count[0].totalCount);
+
+    return {
+      pagesCount: Math.ceil(totalCount / queryParams.pageSize),
+      page: queryParams.pageNumber,
+      pageSize: queryParams.pageSize,
+      totalCount,
+      items,
+    };
+  }
 }

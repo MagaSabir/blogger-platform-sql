@@ -6,28 +6,28 @@ import { PostsRepository } from '../../../posts/infrastructure/posts.repository'
 import { BlogViewModel } from '../queries/view-dto/blog.view-model';
 import { PostViewModel } from '../../../posts/application/view-dto/post-view-model';
 
-export class CreatePostByBlogIdCommand {
+export class CreateBlogPostCommand {
   constructor(
     public dto: CreatePostByBlogId,
     public id: string,
   ) {}
 }
 
-@CommandHandler(CreatePostByBlogIdCommand)
-export class CreatePostByBlogIdUseCase
-  implements ICommandHandler<CreatePostByBlogIdCommand>
+@CommandHandler(CreateBlogPostCommand)
+export class CreateBlogPostUseCase
+  implements ICommandHandler<CreateBlogPostCommand>
 {
   constructor(
     private blogsRepository: BlogsRepository,
     private postsRepository: PostsRepository,
   ) {}
 
-  async execute(command: CreatePostByBlogIdCommand): Promise<PostViewModel> {
+  async execute(command: CreateBlogPostCommand): Promise<PostViewModel> {
     const blog: BlogViewModel | null = await this.blogsRepository.findBlog(
       command.id,
     );
     if (!blog) throw new NotFoundException();
-    return this.postsRepository.createPostByBlogId(
+    return this.postsRepository.createBlogPost(
       command.dto,
       command.id,
       blog.name,

@@ -6,7 +6,15 @@ import { PostViewModel } from '../application/view-dto/post-view-model';
 export class PostsRepository {
   constructor(@InjectDataSource() private dataSource: DataSource) {}
 
-  async createPostByBlogId(
+  async findPost(postId: string): Promise<PostViewModel | null> {
+    const result: PostViewModel[] = await this.dataSource.query(
+      `SELECT * FROM "Posts" WHERE id = $1`,
+      [postId],
+    );
+    return result[0] ?? null;
+  }
+
+  async createBlogPost(
     dto: CreatePostByBlogId,
     blogId: string,
     blogName: string,
@@ -20,7 +28,7 @@ export class PostsRepository {
     return result[0] ?? null;
   }
 
-  async updatePostByBlogId(
+  async updateBlogPost(
     dto: CreatePostByBlogId,
     postId: string,
     blogId: string,
@@ -39,4 +47,6 @@ export class PostsRepository {
       blogId,
     ]);
   }
+
+  async deleteBlogPost(postId: string, blogId: string) {}
 }

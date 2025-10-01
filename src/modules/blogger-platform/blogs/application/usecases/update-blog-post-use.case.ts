@@ -4,29 +4,34 @@ import { PostsRepository } from '../../../posts/infrastructure/posts.repository'
 import { BlogsRepository } from '../../infrastructure/blogs.repository';
 import { NotFoundException } from '@nestjs/common';
 import { BlogViewModel } from '../queries/view-dto/blog.view-model';
+import { PostViewModel } from '../../../posts/application/view-dto/post-view-model';
 
-export class UpdatePostByBlogIdCommand {
+export class UpdateBlogPostCommand {
   constructor(
     public dto: CreatePostByBlogId,
     public params: { blogId: string; postId: string },
   ) {}
 }
 
-@CommandHandler(UpdatePostByBlogIdCommand)
-export class UpdatePostByBlogIdUseCase
-  implements ICommandHandler<UpdatePostByBlogIdCommand>
+@CommandHandler(UpdateBlogPostCommand)
+export class UpdateBlogPostUseCase
+  implements ICommandHandler<UpdateBlogPostCommand>
 {
   constructor(
     private postsRepository: PostsRepository,
     private blogsRepository: BlogsRepository,
   ) {}
-  async execute(command: UpdatePostByBlogIdCommand): Promise<void> {
+  async execute(command: UpdateBlogPostCommand): Promise<void> {
     const blog: BlogViewModel | null = await this.blogsRepository.findBlog(
       command.params.blogId,
     );
+    const post: PostViewModel | null = await this.postsRepository.findPost(
+      command.params.postId,
+    );
     if (!blog) throw new NotFoundException();
+    if (!post) throw new NotFoundException();
 
-    return this.postsRepository.updatePostByBlogId(
+    return this.postsRepository.updateBlogPost(
       command.dto,
       command.params.postId,
       blog.id,
