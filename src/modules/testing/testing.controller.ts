@@ -10,7 +10,7 @@ export class TestingController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteAll() {
     await this.dataSource.query(
-      `TRUNCATE "Users", "Posts", "Blogs", "Sessions" RESTART IDENTITY`,
+      `TRUNCATE "Users", "Posts", "Blogs", "Sessions", "PostLikes" RESTART IDENTITY`,
     );
   }
 }

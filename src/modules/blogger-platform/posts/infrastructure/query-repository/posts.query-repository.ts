@@ -17,11 +17,12 @@ export class PostsQueryRepository {
     const count: { totalCount: string }[] = await this.dataSource.query(
       `SELECT COUNT(*) as "totalCount" FROM "Posts"`,
     );
-    const items: PostViewModel[] = await this.dataSource.query(query, [
+    const posts: PostViewModel[] = await this.dataSource.query(query, [
       queryParams.pageSize,
       queryParams.calculateSkip(),
     ]);
     const totalCount: number = parseInt(count[0].totalCount);
+    const items: PostViewModel[] = posts.map((p) => PostViewModel.mapToView(p));
 
     return {
       pagesCount: Math.ceil(totalCount / queryParams.pageSize),
@@ -32,12 +33,13 @@ export class PostsQueryRepository {
     };
   }
 
-  async getPost(id: string): Promise<PostViewModel> {
+  async getPost(id: string): Promise<PostViewModel | null> {
     const result: PostViewModel[] = await this.dataSource.query(
       `SELECT * FROM "Posts" WHERE id = $1`,
       [id],
     );
-    return result[0] ?? null;
+    if (!result[0]) return null;
+    return PostViewModel.mapToView(result[0]);
   }
 
   async getBlogPosts(
@@ -49,16 +51,16 @@ export class PostsQueryRepository {
                    LIMIT $2 OFFSET $3`;
 
     const count: { totalCount: string }[] = await this.dataSource.query(
-      `SELECT COUNT(*) as "totalCount" FROM "Posts" WHERE "blogId" = $4`,
+      `SELECT COUNT(*) as "totalCount" FROM "Posts" WHERE "blogId" = $1`,
+      [blogId],
     );
-    const items: PostViewModel[] = await this.dataSource.query(query, [
+    const posts: PostViewModel[] = await this.dataSource.query(query, [
       blogId,
       queryParams.pageSize,
       queryParams.calculateSkip(),
-      blogId,
     ]);
     const totalCount: number = parseInt(count[0].totalCount);
-
+    const items: PostViewModel[] = posts.map((p) => PostViewModel.mapToView(p));
     return {
       pagesCount: Math.ceil(totalCount / queryParams.pageSize),
       page: queryParams.pageNumber,

@@ -3,18 +3,23 @@ import { DataSource } from 'typeorm';
 import { CreateBlogDto } from '../dto/create-blog-dto';
 import { BlogViewModel } from '../application/queries/view-dto/blog.view-model';
 import { CreateBlogInputDto } from '../api/input-validation-dto/create-blog-input-dto';
+import { NotFoundException } from '@nestjs/common';
 
 export class BlogsRepository {
   constructor(@InjectDataSource() private dataSource: DataSource) {}
 
-  async findBlog(id: string): Promise<BlogViewModel | null> {
-    const result: BlogViewModel[] = await this.dataSource.query(
-      `SELECT *
+  async findBlog(id: string) {
+    try {
+      const result: BlogViewModel[] = await this.dataSource.query(
+        `SELECT *
        FROM "Blogs"
        WHERE id = $1`,
-      [id],
-    );
-    return result[0] ?? null;
+        [id],
+      );
+      return result[0] ?? null;
+    } catch (err) {
+      if (err.code === '22P02') throw new NotFoundException();
+    }
   }
 
   async createBlog(dto: CreateBlogDto): Promise<BlogViewModel> {

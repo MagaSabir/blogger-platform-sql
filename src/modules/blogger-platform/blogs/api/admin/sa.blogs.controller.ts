@@ -23,7 +23,7 @@ import { CreateBlogCommand } from '../../application/usecases/create-blog.usecas
 import { UpdateBlogCommand } from '../../application/usecases/update-blog.usecase';
 import { DeleteBlogCommand } from '../../application/usecases/delete-blog.usecase';
 import { CreatePostInputDto } from '../input-validation-dto/create-post-input-dto';
-import { CreateBlogPostCommand } from '../../application/usecases/create-blog-post-use.case';
+import { CreateBlogPostCommand } from '../../application/usecases/create-blog-post.usecase';
 import { PostViewModel } from '../../../posts/application/view-dto/post-view-model';
 import { UpdateBlogPostCommand } from '../../application/usecases/update-blog-post-use.case';
 import { DeleteBlogPostCommand } from '../../application/usecases/delete-blog-post.usecase';
@@ -101,12 +101,16 @@ export class SaBlogsController {
   @Delete(':blogId/posts/:postId')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deletePostByBlogId(
-    @Param() params: { blogId: string; postId: string },
+    @Param()
+    params: {
+      blogId: string;
+      postId: string;
+    },
   ): Promise<void> {
     await this.commandBus.execute(new DeleteBlogPostCommand(params));
   }
 
-  @Get(':id')
+  @Get(':id/posts')
   async getBlogPost(
     @Query() query: PostQueryParams,
     @Param('id') id: string,

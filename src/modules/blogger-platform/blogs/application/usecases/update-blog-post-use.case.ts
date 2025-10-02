@@ -22,9 +22,7 @@ export class UpdateBlogPostUseCase
     private blogsRepository: BlogsRepository,
   ) {}
   async execute(command: UpdateBlogPostCommand): Promise<void> {
-    const blog: BlogViewModel | null = await this.blogsRepository.findBlog(
-      command.params.blogId,
-    );
+    const blog = await this.blogsRepository.findBlog(command.params.blogId);
     const post: PostViewModel | null = await this.postsRepository.findPost(
       command.params.postId,
     );

@@ -58,13 +58,14 @@ export class BlogsQueryRepository {
       `SELECT COUNT(*) as "totalCount" FROM "Posts" WHERE "blogId" = $1`,
       [id],
     );
-    const items: PostViewModel[] = await this.dataSource.query(query, [
+    const posts: PostViewModel[] = await this.dataSource.query(query, [
       id,
       queryParams.pageSize,
       queryParams.calculateSkip(),
     ]);
     const totalCount: number = parseInt(count[0].totalCount);
 
+    const items: PostViewModel[] = posts.map((p) => PostViewModel.mapToView(p));
     return {
       pagesCount: Math.ceil(totalCount / queryParams.pageSize),
       page: queryParams.pageNumber,

@@ -10,32 +10,41 @@ export class UsersQueryRepository {
   async getUsers(
     queryParams: UsersQueryParams,
   ): Promise<BasePaginatedResponse<UserViewModel>> {
+    // const query = `
+    //     SELECT id::text, login, email, "createdAt"
+    //     FROM "Users"
+    //     WHERE ($1::text IS NULL OR login ILIKE '%' || $1 || '%')
+    //        OR ($2::text IS NULL OR email ILIKE '%' || $2 || '%')
+    //     ORDER BY "${queryParams.sortBy}" ${queryParams.sortDirection}
+    // LIMIT $3 OFFSET $4
+    // `;
+
     const query = `
-        SELECT id::text, login, email, "createdAt"
+        SELECT id, login, email, "createdAt"
         FROM "Users"
-        WHERE ($1::text IS NULL OR login ILIKE '%' || $1 || '%')
-           OR ($2::text IS NULL OR email ILIKE '%' || $2 || '%')
+        WHERE  login ILIKE '%' || $1 || '%'
+           AND email ILIKE '%' || $2 || '%'
         ORDER BY "${queryParams.sortBy}" ${queryParams.sortDirection}
-    LIMIT $3 OFFSET $4
+        LIMIT $3 OFFSET $4
     `;
 
     const count = `
         SELECT COUNT(*) as "totalCount"
         FROM "Users"
-        WHERE ($1::text IS NULL OR login ILIKE '%' || $1 || '%')
-           OR ($2::text IS NULL OR email ILIKE '%' || $2 || '%')
+        WHERE  login ILIKE '%' || $1 || '%'
+          AND email ILIKE '%' || $2 || '%'
     `;
 
     const [items, totalCountResult] = await Promise.all([
       this.dataSource.query<UserViewModel[]>(query, [
-        queryParams.searchLoginTerm,
-        queryParams.searchEmailTerm,
+        queryParams.searchLoginTerm || '',
+        queryParams.searchEmailTerm || '',
         queryParams.pageSize,
         queryParams.calculateSkip(),
       ]),
       this.dataSource.query<{ totalCount: number }>(count, [
-        queryParams.searchLoginTerm,
-        queryParams.searchEmailTerm,
+        queryParams.searchLoginTerm || '',
+        queryParams.searchEmailTerm || '',
       ]),
     ]);
     const totalCount: number = parseInt(totalCountResult[0].totalCount);

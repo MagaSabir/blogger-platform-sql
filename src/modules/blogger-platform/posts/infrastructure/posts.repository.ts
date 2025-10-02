@@ -25,7 +25,8 @@ export class PostsRepository {
       RETURNING *`,
       [dto.title, dto.shortDescription, dto.content, blogId, blogName],
     );
-    return result[0] ?? null;
+
+    return PostViewModel.mapToView(result[0]);
   }
 
   async updateBlogPost(
@@ -48,5 +49,10 @@ export class PostsRepository {
     ]);
   }
 
-  async deleteBlogPost(postId: string, blogId: string) {}
+  async deleteBlogPost(blogId: string, postId: string) {
+    await this.dataSource.query(
+      `DELETE FROM "Posts" WHERE "id" = $1 AND "blogId" = $2`,
+      [postId, blogId],
+    );
+  }
 }

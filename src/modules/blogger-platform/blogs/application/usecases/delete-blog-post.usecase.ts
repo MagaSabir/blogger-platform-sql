@@ -19,9 +19,8 @@ export class DeleteBlogPostUseCase
   ) {}
 
   async execute(command: DeleteBlogPostCommand): Promise<void> {
-    const blog: BlogViewModel | null = await this.blogsRepository.findBlog(
-      command.params.blogId,
-    );
+    const blog = await this.blogsRepository.findBlog(command.params.blogId);
+    console.log(blog);
     if (!blog) throw new NotFoundException();
 
     const post: PostViewModel | null = await this.postsRepository.findPost(
@@ -33,5 +32,6 @@ export class DeleteBlogPostUseCase
       command.params.blogId,
       command.params.postId,
     );
+    console.log(post);
   }
 }

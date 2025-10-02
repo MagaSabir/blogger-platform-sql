@@ -23,9 +23,7 @@ export class CreateBlogPostUseCase
   ) {}
 
   async execute(command: CreateBlogPostCommand): Promise<PostViewModel> {
-    const blog: BlogViewModel | null = await this.blogsRepository.findBlog(
-      command.id,
-    );
+    const blog = await this.blogsRepository.findBlog(command.id);
     if (!blog) throw new NotFoundException();
     return this.postsRepository.createBlogPost(
       command.dto,
