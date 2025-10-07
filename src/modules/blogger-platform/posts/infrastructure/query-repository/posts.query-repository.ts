@@ -24,6 +24,42 @@ export class PostsQueryRepository {
     const totalCount: number = parseInt(count[0].totalCount);
     const items: PostViewModel[] = posts.map((p) => PostViewModel.mapToView(p));
 
+    const i = await this.dataSource.query(`
+    SELECT 
+    p.id, 
+    p.title,
+    p."shortDescription",
+    p.content, 
+    p."blogId",
+    p."blogName",
+    p."createdAt",
+    COUNT(DISTINCT pl.id) as "likesCount",
+    COUNT(DISTINCT pd.id) as "dislikesCount",
+    (
+        SELECT JSON_AGG(
+            JSON_BUILD_OBJECT(
+                "addedAt", pl2."addedAt",
+                "userId", pl2."userId",
+                "login", u."login"
+            )
+        )
+        FROM (
+            SELECT "addedAt", "userId"
+            FROM "PostLikes" 
+            WHERE "postId" = p.id AND status = 'Like'
+            ORDER BY "addedAt" DESC
+            LIMIT 3
+        ) pl2
+        LEFT JOIN "Users" u ON pl2."userId" = u.id
+    ) as "extendedLikesInfo"
+FROM "Posts" p
+LEFT JOIN "PostLikes" pl ON p.id = pl."postId" AND pl.status = 'Like'
+LEFT JOIN "PostLikes" pd ON p.id = pd."postId" AND pd.status = 'Dislike'
+GROUP BY p.id, p.title, p."shortDescription", p.content, p."blogId", p."blogName", p."createdAt"
+    `);
+
+    console.log(JSON.stringify(i, null, 2));
+
     return {
       pagesCount: Math.ceil(totalCount / queryParams.pageSize),
       page: queryParams.pageNumber,
