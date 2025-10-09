@@ -60,20 +60,19 @@ export class PostsQueryRepository {
     const count: { totalCount: string }[] = await this.dataSource.query(
       `SELECT COUNT(*) as "totalCount" FROM "Posts"`,
     );
-    const posts = await this.dataSource.query(query, [
+    const items: PostViewModel[] = await this.dataSource.query(query, [
       queryParams.pageSize,
       queryParams.calculateSkip(),
       userId,
     ]);
     const totalCount: number = parseInt(count[0].totalCount);
-    // const items: PostViewModel[] = posts.map((p) => PostViewModel.mapToView(p));
 
     return {
       pagesCount: Math.ceil(totalCount / queryParams.pageSize),
       page: queryParams.pageNumber,
       pageSize: queryParams.pageSize,
       totalCount,
-      items: posts,
+      items,
     };
   }
 

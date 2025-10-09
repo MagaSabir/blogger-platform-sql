@@ -6,14 +6,14 @@ import { BasePaginatedResponse } from '../../../../core/base-paginated-response'
 import { PostViewModel } from '../application/view-dto/post-view-model';
 import { GetPostQuery } from '../application/queries/get-post.query';
 import { CurrentUserId } from '../../../../core/decorators/current-user-id';
-import { JwtAuthGuard } from '../../../user-accounts/guards/bearer/jwt-auth.guard';
+import { JwtOptionalAuthGuard } from '../../../user-accounts/guards/bearer/jwt-optional-auth.guard';
 
 @Controller('posts')
 export class PostsController {
   constructor(private queryBus: QueryBus) {}
 
   @Get()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtOptionalAuthGuard)
   async getPosts(
     @Query() query: PostQueryParams,
     @CurrentUserId() userId: string,
@@ -22,6 +22,7 @@ export class PostsController {
   }
 
   @Get(':id')
+  @UseGuards(JwtOptionalAuthGuard)
   async getPost(@Param('id') id: string): Promise<PostViewModel> {
     return this.queryBus.execute(new GetPostQuery(id));
   }
