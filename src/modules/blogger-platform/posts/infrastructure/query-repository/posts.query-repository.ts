@@ -76,13 +76,68 @@ export class PostsQueryRepository {
     };
   }
 
-  async getPost(id: string): Promise<PostViewModel | null> {
-    const result: PostViewModel[] = await this.dataSource.query(
-      `SELECT * FROM "Posts" WHERE id = $1`,
-      [id],
-    );
-    if (!result[0]) return null;
-    return PostViewModel.mapToView(result[0]);
+  async getPost(
+    postId: string,
+    userId?: string,
+  ): Promise<PostViewModel | null> {
+    // const result: PostViewModel[] = await this.dataSource.query(
+    //   `SELECT * FROM "Posts" WHERE id = $1`,
+    //   [id],
+    // );
+
+    //'myStatus',  COALESCE(
+    //                                CASE
+    //                                    WHEN $3::uuid IS NULL THEN 'None'
+    //                                ELSE (
+    //                                     SELECT ps2.status
+    //                                     FROM "PostLikes" ps2
+    //                                     WHERE ps2."postId" = p.id
+    //                                       AND ps2."userId" = $3
+    //                                     )
+    //                                END,'None'),
+
+    const query = `SELECT p.id,
+                          p.title,
+                          p."shortDescription",
+                          p.content,
+                          p."blogId",
+                          p."blogName",
+                          p."createdAt",
+                          JSONB_BUILD_OBJECT(
+                                  'likesCount', COUNT(DISTINCT pl.id),
+                                  'dislikesCount', COUNT(DISTINCT pd.id),
+                                  'myStatus',  COALESCE((
+                                                            SELECT ps2.status
+                                                            FROM "PostLikes" ps2
+                                                            WHERE ps2."postId" = p.id
+                                                              AND ps2."userId" = $1),'None'),
+                                  'newestLikes', COALESCE((SELECT JSONB_AGG(
+                                                                          JSONB_BUILD_OBJECT(
+                                                                                  'addedAt', pl2."addedAt",
+                                                                                  'userId', pl2."userId",
+                                                                                  'login',
+                                                                                  u.login --(SELECT u.login FROM "Users" u WHERE u.id = pl2."userId" )
+                                                                          )
+                                                                  )
+                                                           FROM (SELECT "addedAt", "userId"
+                                                                 FROM "PostLikes"
+                                                                 WHERE "postId" = p.id
+                                                                   AND status = 'Like'
+                                                                 ORDER BY "addedAt" DESC
+                                                                 LIMIT 3) pl2
+                                                                    LEFT JOIN "Users" u ON u.id = pl2."userId"), '[]')
+                          ) as "extendLikesInfo"
+                   FROM "Posts" p
+                   LEFT JOIN "PostLikes" pl ON p.id = pl."postId" AND pl.status = 'Like'
+                   LEFT JOIN "PostLikes" pd ON p.id = pd."postId" AND pd.status = 'Dislike'
+                   WHERE p.id = $2
+                   GROUP BY p.id, p.title, p."shortDescription", p.content, p."blogId", p."blogName", p."createdAt"
+    `;
+    const result: PostViewModel[] = await this.dataSource.query(query, [
+      userId,
+      postId,
+    ]);
+    return result[0];
   }
 
   async getBlogPosts(
