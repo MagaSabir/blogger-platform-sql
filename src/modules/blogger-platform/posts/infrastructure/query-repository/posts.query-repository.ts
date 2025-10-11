@@ -11,10 +11,6 @@ export class PostsQueryRepository {
     queryParams: PostQueryParams,
     userId: string,
   ): Promise<BasePaginatedResponse<PostViewModel>> {
-    // const query = `SELECT * FROM "Posts"
-    //                ORDER BY "${queryParams.sortBy}" ${queryParams.sortDirection}
-    //                LIMIT $1 OFFSET $2`;
-
     const query = `
         SELECT p.id,
                p.title,
@@ -80,22 +76,6 @@ export class PostsQueryRepository {
     postId: string,
     userId?: string,
   ): Promise<PostViewModel | null> {
-    // const result: PostViewModel[] = await this.dataSource.query(
-    //   `SELECT * FROM "Posts" WHERE id = $1`,
-    //   [id],
-    // );
-
-    //'myStatus',  COALESCE(
-    //                                CASE
-    //                                    WHEN $3::uuid IS NULL THEN 'None'
-    //                                ELSE (
-    //                                     SELECT ps2.status
-    //                                     FROM "PostLikes" ps2
-    //                                     WHERE ps2."postId" = p.id
-    //                                       AND ps2."userId" = $3
-    //                                     )
-    //                                END,'None'),
-
     const query = `SELECT p.id,
                           p.title,
                           p."shortDescription",

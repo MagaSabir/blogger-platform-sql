@@ -4,6 +4,7 @@ import {
   Get,
   Param,
   Post,
+  Put,
   Query,
   UseGuards,
 } from '@nestjs/common';
@@ -18,6 +19,9 @@ import { JwtOptionalAuthGuard } from '../../../user-accounts/guards/bearer/jwt-o
 import { JwtAuthGuard } from '../../../user-accounts/guards/bearer/jwt-auth.guard';
 import { PostCommentInputDto } from './input-dto/post-comment.input.dto';
 import { CreateCommentCommand } from '../application/usecases/create-comment.usecase';
+import { GetPostCommentsQuery } from '../application/queries/get-post-comments.query';
+import { LikeStatusInputDto } from './input-dto/like-input.dto';
+import { PostSetLikeCommand } from '../application/usecases/post.set-like.usecase';
 
 @Controller('posts')
 export class PostsController {
@@ -44,6 +48,15 @@ export class PostsController {
     return this.queryBus.execute(new GetPostQuery(id, userId));
   }
 
+  @Get(':id/comments')
+  @UseGuards(JwtOptionalAuthGuard)
+  async getPostComments(
+    @Param('id') id: string,
+    @CurrentUserId() userId: string,
+  ) {
+    return this.queryBus.execute(new GetPostCommentsQuery(id, userId));
+  }
+
   @Post(':id/comments')
   @UseGuards(JwtAuthGuard)
   async createComment(
@@ -51,5 +64,11 @@ export class PostsController {
     @Body() dto: PostCommentInputDto,
   ) {
     return this.commandBus.execute(new CreateCommentCommand(id, dto));
+  }
+
+  @Put(':id/like-status')
+  @UseGuards(JwtAuthGuard)
+  async setLike(@Param('id') id: string, @Body() dto: LikeStatusInputDto) {
+    await this.commandBus.execute(new PostSetLikeCommand(id, dto));
   }
 }
