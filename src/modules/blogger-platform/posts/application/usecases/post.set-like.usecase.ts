@@ -1,15 +1,50 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { LikeStatusInputDto } from '../../api/input-dto/like-input.dto';
+import { PostsRepository } from '../../infrastructure/posts.repository';
+import { NotFoundException } from '@nestjs/common';
+import { LikesRepository } from '../../../likes/posts-likes/infrastructure/likes.repository';
+import { PostLikeType } from '../../../likes/posts-likes/dto/post-like-type';
+import { LikeStatus } from '../view-dto/post-view-model';
 
 export class PostSetLikeCommand {
   constructor(
     public id: string,
-    public dto: LikeStatusInputDto,
+    public status: LikeStatus,
+    public userId: string,
   ) {}
 }
 
 @CommandHandler(PostSetLikeCommand)
 export class PostSetLikeUseCase implements ICommandHandler<PostSetLikeCommand> {
-  constructor() {}
-  async execute() {}
+  constructor(
+    private postsRepository: PostsRepository,
+    private likesRepository: LikesRepository,
+  ) {}
+  async execute(command: PostSetLikeCommand) {
+    const post = await this.postsRepository.findPost(command.id);
+
+    if (!post) throw new NotFoundException();
+
+    const existing: PostLikeType | null =
+      await this.likesRepository.finUserLikeByPostId(
+        command.id,
+        command.userId,
+      );
+
+    if (existing) {
+      if (existing.status !== command.status) {
+        await this.likesRepository.setPostLike(
+          command.id,
+          command.userId,
+          command.status,
+        );
+      }
+    } else {
+      await this.likesRepository.setNewPostLike(
+        command.id,
+        command.userId,
+        command.status,
+      );
+    }
+  }
 }

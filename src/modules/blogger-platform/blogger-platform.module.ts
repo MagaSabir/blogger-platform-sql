@@ -19,6 +19,8 @@ import { UpdateBlogPostUseCase } from './blogs/application/usecases/update-blog-
 import { GetBlogPostsQueryHandler } from './blogs/application/queries/get-blog-posts.query';
 import { DeleteBlogPostUseCase } from './blogs/application/usecases/delete-blog-post.usecase';
 import { CreateBlogPostUseCase } from './blogs/application/usecases/create-blog-post.usecase';
+import { PostSetLikeUseCase } from './posts/application/usecases/post.set-like.usecase';
+import { LikesRepository } from './likes/posts-likes/infrastructure/likes.repository';
 
 const commandHandlers = [
   CreateBlogUseCase,
@@ -28,6 +30,7 @@ const commandHandlers = [
   CreateBlogPostUseCase,
   UpdateBlogPostUseCase,
   DeleteBlogPostUseCase,
+  PostSetLikeUseCase,
 ];
 const queryHandlers = [
   GetBlogQueryHandler,
@@ -47,6 +50,7 @@ const queryHandlers = [
     PostsQueryRepository,
     BlogsRepository,
     PostsRepository,
+    LikesRepository,
   ],
   controllers: [BlogsController, PostsController, SaBlogsController],
 })

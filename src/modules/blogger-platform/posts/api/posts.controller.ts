@@ -68,7 +68,13 @@ export class PostsController {
 
   @Put(':id/like-status')
   @UseGuards(JwtAuthGuard)
-  async setLike(@Param('id') id: string, @Body() dto: LikeStatusInputDto) {
-    await this.commandBus.execute(new PostSetLikeCommand(id, dto));
+  async setLike(
+    @Param('id') id: string,
+    @Body() dto: LikeStatusInputDto,
+    @CurrentUserId() userId: string,
+  ) {
+    await this.commandBus.execute(
+      new PostSetLikeCommand(id, dto.likeStatus, userId),
+    );
   }
 }
