@@ -3,10 +3,8 @@ import { DataSource } from 'typeorm';
 import { LikeStatus } from '../../../posts/application/view-dto/post-view-model';
 import { PostLikeType } from '../dto/post-like-type';
 
-export class LikesRepository {
+export class PostLikesRepository {
   constructor(@InjectDataSource() private dataSource: DataSource) {}
-
-  async updateCommentLikeStatus(commentId: string, likeStatus: LikeStatus) {}
 
   async finUserLikeByPostId(
     id: string,
@@ -22,7 +20,7 @@ export class LikesRepository {
   }
 
   async setPostLike(id: string, userId: string, status: LikeStatus) {
-    const result = await this.dataSource.query(
+    await this.dataSource.query(
       `
     UPDATE "PostLikes" SET status = $3, "addedAt" = now() WHERE "postId" = $1 AND "userId" = $2
     `,

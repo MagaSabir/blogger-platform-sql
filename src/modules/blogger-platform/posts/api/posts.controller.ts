@@ -19,9 +19,12 @@ import { JwtOptionalAuthGuard } from '../../../user-accounts/guards/bearer/jwt-o
 import { JwtAuthGuard } from '../../../user-accounts/guards/bearer/jwt-auth.guard';
 import { PostCommentInputDto } from './input-dto/post-comment.input.dto';
 import { CreateCommentCommand } from '../application/usecases/create-comment.usecase';
-import { GetPostCommentsQuery } from '../application/queries/get-post-comments.query';
+import { GetPostCommentQuery } from '../../comments/application/queries/get-post-comment.query';
 import { LikeStatusInputDto } from './input-dto/like-input.dto';
 import { PostSetLikeCommand } from '../application/usecases/post.set-like.usecase';
+import { CommentViewModel } from '../../comments/api/view-models/comment-view-model';
+import { GetPostCommentsQuery } from '../application/queries/get-post-comments.query';
+import { CommentQueryParams } from '../../comments/input-dto/comment-query-params';
 
 @Controller('posts')
 export class PostsController {
@@ -51,10 +54,10 @@ export class PostsController {
   @Get(':id/comments')
   @UseGuards(JwtOptionalAuthGuard)
   async getPostComments(
-    @Param('id') id: string,
+    @Query() query: CommentQueryParams,
     @CurrentUserId() userId: string,
-  ) {
-    return this.queryBus.execute(new GetPostCommentsQuery(id, userId));
+  ): Promise<CommentViewModel> {
+    return this.queryBus.execute(new GetPostCommentsQuery(userId, query));
   }
 
   @Post(':id/comments')
@@ -62,13 +65,16 @@ export class PostsController {
   async createComment(
     @Param('id') id: string,
     @Body() dto: PostCommentInputDto,
-  ) {
-    return this.commandBus.execute(new CreateCommentCommand(id, dto));
+    @CurrentUserId() userId: string,
+  ): Promise<CommentViewModel> {
+    return this.commandBus.execute<GetPostCommentQuery, CommentViewModel>(
+      new CreateCommentCommand(id, dto, userId),
+    );
   }
 
   @Put(':id/like-status')
   @UseGuards(JwtAuthGuard)
-  async setLike(
+  async setPostLike(
     @Param('id') id: string,
     @Body() dto: LikeStatusInputDto,
     @CurrentUserId() userId: string,

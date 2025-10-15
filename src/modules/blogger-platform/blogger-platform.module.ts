@@ -20,7 +20,17 @@ import { GetBlogPostsQueryHandler } from './blogs/application/queries/get-blog-p
 import { DeleteBlogPostUseCase } from './blogs/application/usecases/delete-blog-post.usecase';
 import { CreateBlogPostUseCase } from './blogs/application/usecases/create-blog-post.usecase';
 import { PostSetLikeUseCase } from './posts/application/usecases/post.set-like.usecase';
-import { LikesRepository } from './likes/posts-likes/infrastructure/likes.repository';
+import { PostLikesRepository } from './likes/posts-likes/infrastructure/post-likes.repository';
+import { CreateCommentUseCase } from './posts/application/usecases/create-comment.usecase';
+import { CommentsQueryRepository } from './comments/infrastructure/comments.query-repository';
+import { CommentsRepository } from './comments/infrastructure/comments.repository';
+import { GetPostCommentQueryHandler } from './comments/application/queries/get-post-comment.query';
+import { CommentsController } from './comments/api/comments.controller';
+import { GetPostCommentsQueryHandler } from './posts/application/queries/get-post-comments.query';
+import { UpdateCommentUserCase } from './comments/application/usecases/update-comment.usecase';
+import { DeleteCommentUseCase } from './comments/application/usecases/delete-comment.usecase';
+import { CommentLikesRepository } from './likes/comment-likes/infrastructure/comment-likes.repository';
+import { CommentSetLikeUseCase } from './comments/application/usecases/comment-set-like-use.case';
 
 const commandHandlers = [
   CreateBlogUseCase,
@@ -31,6 +41,10 @@ const commandHandlers = [
   UpdateBlogPostUseCase,
   DeleteBlogPostUseCase,
   PostSetLikeUseCase,
+  CreateCommentUseCase,
+  UpdateCommentUserCase,
+  DeleteCommentUseCase,
+  CommentSetLikeUseCase,
 ];
 const queryHandlers = [
   GetBlogQueryHandler,
@@ -39,6 +53,8 @@ const queryHandlers = [
   GetAllPostsQueryHandler,
   GetPostQueryHandler,
   GetBlogPostsQueryHandler,
+  GetPostCommentQueryHandler,
+  GetPostCommentsQueryHandler,
 ];
 @Module({
   imports: [CqrsModule],
@@ -50,8 +66,16 @@ const queryHandlers = [
     PostsQueryRepository,
     BlogsRepository,
     PostsRepository,
-    LikesRepository,
+    PostLikesRepository,
+    CommentsQueryRepository,
+    CommentsRepository,
+    CommentLikesRepository,
   ],
-  controllers: [BlogsController, PostsController, SaBlogsController],
+  controllers: [
+    BlogsController,
+    PostsController,
+    SaBlogsController,
+    CommentsController,
+  ],
 })
 export class BloggerPlatformModule {}

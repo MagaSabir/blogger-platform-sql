@@ -2,7 +2,6 @@ import { CreateBlogInputDto } from '../../api/input-validation-dto/create-blog-i
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { BlogsRepository } from '../../infrastructure/blogs.repository';
 import { NotFoundException } from '@nestjs/common';
-import { BlogViewModel } from '../queries/view-dto/blog.view-model';
 
 export class UpdateBlogCommand {
   constructor(

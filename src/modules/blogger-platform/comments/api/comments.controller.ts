@@ -7,11 +7,18 @@ import {
   Put,
   UseGuards,
 } from '@nestjs/common';
-import { UpdateCommentLikeStatusCommand } from '../application/usecases/update-comment-like-status.usecase';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { LikeStatus } from '../../posts/application/view-dto/post-view-model';
 import { JwtAuthGuard } from '../../../user-accounts/guards/bearer/jwt-auth.guard';
 import { JwtOptionalAuthGuard } from '../../../user-accounts/guards/bearer/jwt-optional-auth.guard';
+import { GetPostCommentQuery } from '../application/queries/get-post-comment.query';
+import { CurrentUserId } from '../../../../core/decorators/current-user-id';
+import { CommentViewModel } from './view-models/comment-view-model';
+import { CommentSetLikeCommand } from '../application/usecases/comment-set-like-use.case';
+import { CommentUpdateDto } from './input-dto/comment-update.dto';
+import { UpdateCommentCommand } from '../application/usecases/update-comment.usecase';
+import { DeleteCommentCommand } from '../application/usecases/delete-comment.usecase';
+import { LikeStatusInputDto } from '../../posts/api/input-dto/like-input.dto';
 
 @Controller('comments')
 export class CommentsController {
@@ -22,21 +29,36 @@ export class CommentsController {
 
   @Put(':id/like-status')
   @UseGuards(JwtAuthGuard)
-  async updateCommentLike(@Param('id') id: string, @Body() status: LikeStatus) {
-    return this.commandBus.execute(
-      new UpdateCommentLikeStatusCommand(id, status),
+  async setCommentLike(
+    @Param('id') id: string,
+    @Body() dto: LikeStatusInputDto,
+    @CurrentUserId() userId: string,
+  ): Promise<void> {
+    await this.commandBus.execute(
+      new CommentSetLikeCommand(id, dto.likeStatus, userId),
     );
   }
 
   @Put(':id')
   @UseGuards(JwtAuthGuard)
-  async updateComment(@Param('id') id: string) {}
+  async updateComment(@Param('id') id: string, @Body() dto: CommentUpdateDto) {
+    await this.commandBus.execute(new UpdateCommentCommand(id, dto.content));
+  }
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
-  async deleteComment(@Param('id') id: string) {}
+  async deleteComment(@Param('id') id: string) {
+    await this.commandBus.execute(new DeleteCommentCommand(id));
+  }
 
   @Get(':id')
   @UseGuards(JwtOptionalAuthGuard)
-  async getComment(@Param('id') id: string) {}
+  async getComment(
+    @Param('id') id: string,
+    @CurrentUserId() userId: string,
+  ): Promise<CommentViewModel> {
+    return this.queryBus.execute<GetPostCommentQuery, CommentViewModel>(
+      new GetPostCommentQuery(id, userId),
+    );
+  }
 }

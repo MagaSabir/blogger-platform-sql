@@ -3,7 +3,6 @@ import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { PostsQueryRepository } from '../../infrastructure/query-repository/posts.query-repository';
 import { BasePaginatedResponse } from '../../../../../core/base-paginated-response';
 import { PostViewModel } from '../view-dto/post-view-model';
-import { JwtService } from '@nestjs/jwt';
 
 export class GetAllPostsQuery {
   constructor(

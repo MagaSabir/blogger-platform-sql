@@ -1,8 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { LikeStatusInputDto } from '../../api/input-dto/like-input.dto';
 import { PostsRepository } from '../../infrastructure/posts.repository';
 import { NotFoundException } from '@nestjs/common';
-import { LikesRepository } from '../../../likes/posts-likes/infrastructure/likes.repository';
+import { PostLikesRepository } from '../../../likes/posts-likes/infrastructure/post-likes.repository';
 import { PostLikeType } from '../../../likes/posts-likes/dto/post-like-type';
 import { LikeStatus } from '../view-dto/post-view-model';
 
@@ -18,7 +17,7 @@ export class PostSetLikeCommand {
 export class PostSetLikeUseCase implements ICommandHandler<PostSetLikeCommand> {
   constructor(
     private postsRepository: PostsRepository,
-    private likesRepository: LikesRepository,
+    private likesRepository: PostLikesRepository,
   ) {}
   async execute(command: PostSetLikeCommand) {
     const post = await this.postsRepository.findPost(command.id);
