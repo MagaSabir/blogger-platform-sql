@@ -20,8 +20,8 @@ export class PostsQueryRepository {
                p."blogName",
                p."createdAt",
                JSONB_BUILD_OBJECT(
-                       'likesCount', COUNT(DISTINCT pl.id),
-                       'dislikesCount', COUNT(DISTINCT pd.id),
+                       'likesCount', COUNT(DISTINCT pl."userId"),
+                       'dislikesCount', COUNT(DISTINCT pd."userId"),
                        'myStatus',  COALESCE((
                                     SELECT ps2.status
                                     FROM "PostLikes" ps2
@@ -44,7 +44,7 @@ export class PostsQueryRepository {
                                          LEFT JOIN "Users" u ON pl2."userId" = u.id),
                                '[]'
                                       )
-               ) as "extendLikesInfo"
+               ) as "extendedLikesInfo"
         FROM "Posts" p
                  LEFT JOIN "PostLikes" pl ON p.id = pl."postId" AND pl.status = 'Like'
                  LEFT JOIN "PostLikes" pd ON p.id = pd."postId" AND pd.status = 'Dislike'
@@ -84,8 +84,8 @@ export class PostsQueryRepository {
                           p."blogName",
                           p."createdAt",
                           JSONB_BUILD_OBJECT(
-                                  'likesCount', COUNT(DISTINCT pl.id),
-                                  'dislikesCount', COUNT(DISTINCT pd.id),
+                                  'likesCount', COUNT(DISTINCT pl."userId"),
+                                  'dislikesCount', COUNT(DISTINCT pd."userId"),
                                   'myStatus',  COALESCE((
                                                             SELECT ps2.status
                                                             FROM "PostLikes" ps2
@@ -106,7 +106,7 @@ export class PostsQueryRepository {
                                                                  ORDER BY "addedAt" DESC
                                                                  LIMIT 3) pl2
                                                                     LEFT JOIN "Users" u ON u.id = pl2."userId"), '[]')
-                          ) as "extendLikesInfo"
+                          ) as "extendedLikesInfo"
                    FROM "Posts" p
                    LEFT JOIN "PostLikes" pl ON p.id = pl."postId" AND pl.status = 'Like'
                    LEFT JOIN "PostLikes" pd ON p.id = pd."postId" AND pd.status = 'Dislike'

@@ -2,6 +2,8 @@ import {
   Body,
   Controller,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   Post,
   Put,
@@ -56,8 +58,9 @@ export class PostsController {
   async getPostComments(
     @Query() query: CommentQueryParams,
     @CurrentUserId() userId: string,
+    @Param('id') id: string,
   ): Promise<CommentViewModel> {
-    return this.queryBus.execute(new GetPostCommentsQuery(userId, query));
+    return this.queryBus.execute(new GetPostCommentsQuery(userId, id, query));
   }
 
   @Post(':id/comments')
@@ -73,6 +76,7 @@ export class PostsController {
   }
 
   @Put(':id/like-status')
+  @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(JwtAuthGuard)
   async setPostLike(
     @Param('id') id: string,

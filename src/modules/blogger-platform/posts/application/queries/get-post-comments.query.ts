@@ -3,10 +3,12 @@ import { CommentsQueryRepository } from '../../../comments/infrastructure/commen
 import { CommentViewModel } from '../../../comments/api/view-models/comment-view-model';
 import { CommentQueryParams } from '../../../comments/input-dto/comment-query-params';
 import { BasePaginatedResponse } from '../../../../../core/base-paginated-response';
+import { NotFoundException } from '@nestjs/common';
 
 export class GetPostCommentsQuery {
   constructor(
     public userId: string,
+    public id: string,
     public queryParams: CommentQueryParams,
   ) {}
 }
@@ -20,9 +22,12 @@ export class GetPostCommentsQueryHandler
   async execute(
     query: GetPostCommentsQuery,
   ): Promise<BasePaginatedResponse<CommentViewModel>> {
-    return this.commentsQueryRepository.getComments(
-      query.queryParams,
-      query.userId,
-    );
+    const comments: BasePaginatedResponse<CommentViewModel> =
+      await this.commentsQueryRepository.getComments(
+        query.queryParams,
+        query.id,
+        query.userId,
+      );
+    return comments;
   }
 }

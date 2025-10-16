@@ -1,6 +1,7 @@
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { CommentViewModel } from '../api/view-models/comment-view-model';
+import { CommentModelType } from '../types/comment-model.type';
 
 export class CommentsRepository {
   constructor(@InjectDataSource() private dataSource: DataSource) {}
@@ -40,8 +41,8 @@ export class CommentsRepository {
     return result[0].id;
   }
 
-  async findComment(id: string): Promise<CommentViewModel | null> {
-    const result: CommentViewModel[] = await this.dataSource.query(
+  async findComment(id: string): Promise<CommentModelType | null> {
+    const result: CommentModelType[] = await this.dataSource.query(
       `SELECT * FROM "Comments" WHERE id = $1`,
       [id],
     );

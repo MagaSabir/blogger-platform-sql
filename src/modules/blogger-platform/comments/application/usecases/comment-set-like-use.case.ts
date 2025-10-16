@@ -5,6 +5,7 @@ import { CommentLikesRepository } from '../../../likes/comment-likes/infrastruct
 import { CommentViewModel } from '../../api/view-models/comment-view-model';
 import { NotFoundException } from '@nestjs/common';
 import { CommentLikeType } from '../../../likes/comment-likes/dto/comment-like-type';
+import { CommentModelType } from '../../types/comment-model.type';
 
 export class CommentSetLikeCommand {
   constructor(
@@ -24,7 +25,7 @@ export class CommentSetLikeUseCase
   ) {}
 
   async execute(command: CommentSetLikeCommand): Promise<void> {
-    const comment: CommentViewModel | null =
+    const comment: CommentModelType | null =
       await this.commentsRepository.findComment(command.id);
 
     if (!comment) throw new NotFoundException();

@@ -3,12 +3,13 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   Put,
   UseGuards,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { LikeStatus } from '../../posts/application/view-dto/post-view-model';
 import { JwtAuthGuard } from '../../../user-accounts/guards/bearer/jwt-auth.guard';
 import { JwtOptionalAuthGuard } from '../../../user-accounts/guards/bearer/jwt-optional-auth.guard';
 import { GetPostCommentQuery } from '../application/queries/get-post-comment.query';
@@ -28,6 +29,7 @@ export class CommentsController {
   ) {}
 
   @Put(':id/like-status')
+  @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(JwtAuthGuard)
   async setCommentLike(
     @Param('id') id: string,
@@ -40,15 +42,26 @@ export class CommentsController {
   }
 
   @Put(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(JwtAuthGuard)
-  async updateComment(@Param('id') id: string, @Body() dto: CommentUpdateDto) {
-    await this.commandBus.execute(new UpdateCommentCommand(id, dto.content));
+  async updateComment(
+    @Param('id') id: string,
+    @Body() dto: CommentUpdateDto,
+    @CurrentUserId() userId: string,
+  ) {
+    await this.commandBus.execute(
+      new UpdateCommentCommand(id, dto.content, userId),
+    );
   }
 
   @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(JwtAuthGuard)
-  async deleteComment(@Param('id') id: string) {
-    await this.commandBus.execute(new DeleteCommentCommand(id));
+  async deleteComment(
+    @Param('id') id: string,
+    @CurrentUserId() userId: string,
+  ) {
+    await this.commandBus.execute(new DeleteCommentCommand(id, userId));
   }
 
   @Get(':id')

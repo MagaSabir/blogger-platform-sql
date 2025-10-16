@@ -3,6 +3,7 @@ import { DataSource } from 'typeorm';
 import { CommentViewModel } from '../api/view-models/comment-view-model';
 import { CommentQueryParams } from '../input-dto/comment-query-params';
 import { BasePaginatedResponse } from '../../../../core/base-paginated-response';
+import { NotFoundException } from '@nestjs/common';
 
 export class CommentsQueryRepository {
   constructor(@InjectDataSource() private dataSource: DataSource) {}
@@ -25,7 +26,7 @@ export class CommentsQueryRepository {
                        'myStatus',
                        COALESCE((SELECT c.status FROM "CommentLikes" c WHERE ps.id = c."commentId" AND c."userId" = $2),
                                 'None')
-               ) as "likeInfo"
+               ) as "likesInfo"
         FROM "Comments" ps
                  LEFT JOIN "Users" u ON u.id = ps."userId"
         WHERE ps."id" = $1
@@ -37,6 +38,7 @@ export class CommentsQueryRepository {
 
   async getComments(
     queryParams: CommentQueryParams,
+    postId: string,
     userId?: string,
   ): Promise<BasePaginatedResponse<CommentViewModel>> {
     const query = `
@@ -55,23 +57,27 @@ export class CommentsQueryRepository {
                        'myStatus',
                        COALESCE((SELECT c.status FROM "CommentLikes" c WHERE ps.id = c."commentId" AND c."userId" = $1),
                                 'None')
-               ) as "likeInfo"
+               ) as "likesInfo"
         FROM "Comments" ps
                  LEFT JOIN "Users" u ON u.id = ps."userId"
+    WHERE ps."postId" = $4
     ORDER BY "${queryParams.sortBy}" ${queryParams.sortDirection}
     LIMIT $2 OFFSET $3
     `;
 
     const count: { totalCount: string }[] = await this.dataSource.query(
-      `SELECT COUNT(*) as "totalCount" FROM "Comments"`,
+      `SELECT COUNT(*) as "totalCount" FROM "Comments" WHERE "postId" = $1`,
+      [postId],
     );
 
     const items: CommentViewModel[] = await this.dataSource.query(query, [
       userId,
       queryParams.pageSize,
       queryParams.calculateSkip(),
+      postId,
     ]);
     const totalCount: number = parseInt(count[0].totalCount);
+    if (items.length === 0) throw new NotFoundException();
 
     return {
       pagesCount: Math.ceil(totalCount / queryParams.pageSize),
