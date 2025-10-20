@@ -31,6 +31,7 @@ import { RefreshTokenGuard } from '../../guards/refresh-token/resfresh-token.gua
 import { RefreshTokenCommand } from '../application/usecase/refresh-token.usecase';
 import { GetRefreshToken } from '../../decorators/get-refresh-token';
 import { LogoutCommand } from '../application/usecase/logout.usecase';
+import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 
 @Controller('auth')
 @UseGuards(ThrottlerGuard)

@@ -80,6 +80,12 @@ importers:
       rxjs:
         specifier: ^7.8.1
         version: 7.8.2
+      swagger-themes:
+        specifier: ^1.4.3
+        version: 1.4.3
+      swagger-ui-themes:
+        specifier: ^3.0.1
+        version: 3.0.1
       typeorm:
         specifier: ^0.3.26
         version: 0.3.26(mongodb@6.17.0)(pg@8.16.3)(reflect-metadata@0.2.2)(ts-node@10.9.2(@swc/core@1.12.14)(@types/node@22.16.4)(typescript@5.8.3))
@@ -4277,8 +4283,15 @@ packages:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
 
+  swagger-themes@1.4.3:
+    resolution: {integrity: sha512-1G0CqJC1IBbNxkAOyJoREd9hfwXH1R6+3GOFxLhQho2w2i+AbaJqkF4mTJhkce4yhaEMUXvv4KKu1YO/qpe6nQ==}
+
   swagger-ui-dist@5.21.0:
     resolution: {integrity: sha512-E0K3AB6HvQd8yQNSMR7eE5bk+323AUxjtCz/4ZNKiahOlPhPJxqn3UPIGs00cyY/dhrTDJ61L7C/a8u6zhGrZg==}
+
+  swagger-ui-themes@3.0.1:
+    resolution: {integrity: sha512-oQpH1uVJVio5R453YvyF3CJzwoEnIfJvWlwwFA0g4AX2NvnnjaT9wAT5kbFLs8pFhfGeq/mA/VlTOFYllm5Rzg==}
+    engines: {node: '>=0.10.3'}
 
   symbol-observable@4.0.0:
     resolution: {integrity: sha512-b19dMThMV4HVFynSAM1++gBHAbk2Tc/osgLIBZMKsyqh34jb2e8Os7T6ZW/Bt3pJFdBTd2JwAnAAEQV7rSNvcQ==}
@@ -9674,9 +9687,13 @@ snapshots:
 
   supports-preserve-symlinks-flag@1.0.0: {}
 
+  swagger-themes@1.4.3: {}
+
   swagger-ui-dist@5.21.0:
     dependencies:
       '@scarf/scarf': 1.4.0
+
+  swagger-ui-themes@3.0.1: {}
 
   symbol-observable@4.0.0: {}
 
