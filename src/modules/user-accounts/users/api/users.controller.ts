@@ -31,6 +31,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { ErrorViewModel } from '../../../../core/view-dto/error-view-model';
 
 @ApiTags('Users')
 @Controller('sa/users')
@@ -50,7 +51,8 @@ export class UsersController {
   })
   @ApiResponse({
     status: 400,
-    description: 'If the input has incorrect values',
+    type: ErrorViewModel,
+    description: 'If the password or login is wrong',
   })
   @ApiResponse({
     status: 401,

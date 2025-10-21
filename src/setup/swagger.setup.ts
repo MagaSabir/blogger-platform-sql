@@ -9,9 +9,15 @@ export function swaggerSetup(app: INestApplication) {
     .setVersion('1.0')
     .addTag('Blog')
     .addBearerAuth(
-      { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        description: 'Enter JWT Bearer token only',
+      },
       'jwt',
     )
+    .addCookieAuth('refreshToken')
     .addBasicAuth({ type: 'http', scheme: 'basic' }, 'basic')
     .build();
   const document = SwaggerModule.createDocument(app, config);
