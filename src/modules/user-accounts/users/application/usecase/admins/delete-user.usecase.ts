@@ -3,7 +3,7 @@ import { CommandHandler } from '@nestjs/cqrs';
 import { UserViewModel } from '../../../api/view-dto/user-view-model';
 
 export class DeleteUserCommand {
-  constructor(public id: number) {}
+  constructor(public id: string) {}
 }
 
 @CommandHandler(DeleteUserCommand)

@@ -24,7 +24,7 @@ export class UsersRepository {
     return { ...user, id: user.id.toString() };
   }
 
-  async deleteUserById(id: number): Promise<void> {
+  async deleteUserById(id: string): Promise<void> {
     const query = `DELETE FROM "Users" WHERE id = $1`;
     await this.dataSource.query(query, [id]);
   }
@@ -40,7 +40,7 @@ export class UsersRepository {
     return result.length ? result[0] : null;
   }
 
-  async findUserOrThrowNotFound(id: number): Promise<UserViewModel> {
+  async findUserOrThrowNotFound(id: string): Promise<UserViewModel> {
     const user: UserViewModel[] = await this.dataSource.query(
       `SELECT * FROM "Users" WHERE id = $1`,
       [id],

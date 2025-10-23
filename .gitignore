@@ -39,6 +39,7 @@ lerna-debug.log*
 src/env/.env.production
 src/env/.env.development.local
 src/env/.env.testing.local
+src/env/.env.testing
 
 .env.testing.local
 .env.production.local

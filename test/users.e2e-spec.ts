@@ -4,18 +4,24 @@ import request from 'supertest';
 import { App } from 'supertest/types';
 import { AppModule } from '../src/app.module';
 import process from 'node:process';
+import { ConfigModule } from '@nestjs/config';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication<App>;
   const basicAuthCredentials = 'admin:qwerty';
   const base64Credentials =
     Buffer.from(basicAuthCredentials).toString('base64');
-  const users: [] = [];
   beforeAll(async () => {
     process.env.NODE_ENV = 'testing.local';
 
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
+      imports: [
+        ConfigModule.forRoot({
+          envFilePath: `.env.${process.env.NODE_ENV}.local`,
+          isGlobal: true,
+        }),
+        AppModule,
+      ],
     }).compile();
 
     app = moduleFixture.createNestApplication();
@@ -25,26 +31,6 @@ describe('AppController (e2e)', () => {
     await app.init();
     // await request(app.getHttpServer()).delete('/testing/all-data');
   });
-
-  afterAll(async () => {
-    await app.close();
-  });
-
-  // it('/ (POST)', async () => {
-  //   for (let i = 0; i < 3; i++) {
-  //     const user = await request(app.getHttpServer())
-  //       .post('/sa/users')
-  //       .set('Authorization', `Basic ${base64Credentials}`)
-  //       .send({
-  //         login: `user${i}`,
-  //         password: 'user12',
-  //         email: `user${i}@example.com`,
-  //       })
-  //       .expect(201);
-  //     // @ts-ignore
-  //     users.push(user.body);
-  //   }
-  // });
 
   it('should GET', async () => {
     const users = await request(app.getHttpServer())
