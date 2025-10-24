@@ -16,8 +16,3 @@ export class BasePaginatedResponse<T> {
   @ApiProperty({ isArray: true })
   items: T[];
 }
-
-export class PaginatedUsersResponse extends BasePaginatedResponse<UserViewModel> {
-  @ApiProperty({ type: UserViewModel, isArray: true })
-  declare items: UserViewModel[];
-}

@@ -12,6 +12,8 @@ async function bootstrap() {
   const coreConfig = app.get<CoreConfig>(CoreConfig);
   app.use(cookieParser());
 
+  console.log('🚀 Starting server on port:', coreConfig.port);
+
   await app.listen(coreConfig.port || 3000);
 }
 

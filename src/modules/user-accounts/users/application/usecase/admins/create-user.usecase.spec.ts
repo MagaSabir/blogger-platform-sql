@@ -28,6 +28,9 @@ describe('Create user useCase', () => {
       userConfig,
     );
   });
+  afterAll(() => {
+    jest.clearAllMocks();
+  });
 
   it('should create a new user successfully', async () => {
     const dto = {
