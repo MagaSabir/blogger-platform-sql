@@ -1,5 +1,5 @@
 import { CreateUserDto } from '../../dto/create-user.dto';
-import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PasswordService } from '../services/password.service';
 import { UsersRepository } from '../../infrastructure/users.repository';
 import { v4 as uuidv4 } from 'uuid';
@@ -17,7 +17,6 @@ export class RegistrationUserUseCase
 {
   constructor(
     private passwordService: PasswordService,
-    private eventBus: EventBus,
     private userRepository: UsersRepository,
     private mailService: EmailService,
   ) {}
