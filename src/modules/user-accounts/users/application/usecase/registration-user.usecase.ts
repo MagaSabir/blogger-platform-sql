@@ -58,7 +58,6 @@ export class RegistrationUserUseCase
       confirmationCode: code,
     };
     await this.userRepository.registerUser(user);
-    // this.eventBus.publish(new UserRegisteredEvent(user.email, code));
     this.mailService.sendConfirmationEmail(user.email, code);
   }
 }
